@@ -1,0 +1,14 @@
+language: android
+sudo: required
+dist: trusty
+
+android:
+  components:
+    - tools
+    - build-tools-23.0.2
+    - android-23
+    - extra
+
+before_install:
+  - git clone https://github.com/urho3d/android-ndk.git $HOME/android-ndk-root
+  - export ANDROID_NDK_HOME=$HOME/android-ndk-root

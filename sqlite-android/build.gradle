@@ -1,0 +1,159 @@
+plugins {
+    id 'de.undercouch.download' version '2.1.0'
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'de.undercouch.download'
+apply plugin: 'com.jfrog.bintray'
+
+import de.undercouch.gradle.tasks.download.Download
+
+group = 'io.requery'
+version = '3.12.0'
+description = 'Android SQLite compatibility library'
+
+project.afterEvaluate{
+    build.dependsOn('buildSqlite')
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName project.version
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    // ndk gradle support is still very bad so it's built the regular ndk-build
+    sourceSets.main.jni.srcDirs = ['src/main/none']
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.4'
+    androidTestCompile 'com.android.support.test:rules:0.4'
+}
+
+ext {
+    sqliteDistributionUrl = 'http://www.sqlite.org/2016/sqlite-amalgamation-3120000.zip'
+    pomXml = {
+        resolveStrategy = Closure.DELEGATE_FIRST
+        name project.name
+        description project.description
+        url 'https://github.com/requery/sqlite-android'
+        scm {
+            url 'https://github.com/requery/sqlite-android.git'
+            connection 'scm:git:git://github.com/requery/sqlite-android.git'
+            developerConnection 'scm:git:git@github.com/requery/sqlite-android.git'
+        }
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        developers {
+            developer {
+                id 'npurushe'
+                name 'Nikhil Purushe'
+            }
+        }
+    }
+}
+
+android.libraryVariants
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
+            artifact "build/outputs/aar/${project.name}-release.aar"
+            artifact(javadocJar) {
+                classifier 'javadoc'
+            }
+            pom.withXml {
+                asNode().children().last() + project.pomXml
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+File localProperties = project.rootProject.file('local.properties')
+if (localProperties.exists()) {
+    properties.load(localProperties.newDataInputStream())
+}
+
+bintray {
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apikey')
+    publications = ['maven']
+    pkg {
+        repo = 'requery'
+        name = 'sqlite-android'
+        userOrg = 'requery'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/requery/sqlite-android.git'
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.compile
+    failOnError false;
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task downloadSqlite(type: Download) {
+    src project.sqliteDistributionUrl
+    dest 'src/main/jni/sqlite.zip'
+}
+
+task installSqlite(dependsOn: downloadSqlite, type: Copy) {
+    from zipTree(downloadSqlite.dest).matching {
+        include '*/sqlite3.*'
+        eachFile { it.setPath(it.getName()) }
+    }
+    into 'src/main/jni/sqlite'
+}
+
+task buildSqlite(dependsOn: installSqlite, type: Exec) {
+    workingDir 'src/main/jni'
+    commandLine System.properties.find { it.key == 'ANDROID_NDK_HOME' } ?:
+            properties.getProperty('ndk.dir') + '/ndk-build'
+}

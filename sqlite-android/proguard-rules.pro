@@ -1,0 +1,2 @@
+-keepclassmembers class io.requery.android.database.** { *; }
+-keep class io.requery.android.database.** { *; }
