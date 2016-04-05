@@ -20,7 +20,6 @@ package io.requery.android.database;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.test.PerformanceTestCase;
-import android.test.suitebuilder.annotation.Suppress;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import junit.framework.TestCase;
 
@@ -31,7 +30,6 @@ import java.util.Random;
  * Database Performance Tests
  * 
  */
-@Suppress // needs SD card access for some reason, consider changing
 public class NewDatabasePerformanceTests {
 
     // Edit this to change the test run times.  The original is 100.

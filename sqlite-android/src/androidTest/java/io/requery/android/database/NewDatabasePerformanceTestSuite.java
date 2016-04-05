@@ -18,8 +18,11 @@
 package io.requery.android.database;
 
 import junit.framework.TestSuite;
+import org.junit.Ignore;
 
+@Ignore
 public class NewDatabasePerformanceTestSuite extends TestSuite {
+
     public static TestSuite suite() {
         TestSuite suite =
           new TestSuite(NewDatabasePerformanceTestSuite.class.getName());
