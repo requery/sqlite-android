@@ -13,8 +13,8 @@ group = 'io.requery'
 version = '3.12.0'
 description = 'Android SQLite compatibility library'
 
-project.afterEvaluate{
-    build.dependsOn('buildSqlite')
+gradle.projectsEvaluated {
+    preBuild.dependsOn(buildSqlite)
 }
 
 android {
