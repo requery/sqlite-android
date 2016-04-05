@@ -155,6 +155,6 @@ task installSqlite(dependsOn: downloadSqlite, type: Copy) {
 
 task buildSqlite(dependsOn: installSqlite, type: Exec) {
     workingDir 'src/main/jni'
-    commandLine System.properties.find { it.key == 'ANDROID_NDK_HOME' } ?:
+    commandLine System.getenv('ANDROID_NDK_HOME') ?:
             properties.getProperty('ndk.dir') + '/ndk-build'
 }
