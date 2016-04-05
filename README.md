@@ -1,5 +1,6 @@
 #Android SQLite support library
 
+[![Build Status](https://travis-ci.org/requery/sqlite-android.svg?branch=master)](https://travis-ci.org/requery/sqlite-android)
 [ ![Download](https://api.bintray.com/packages/requery/requery/sqlite-android/images/download.svg) ](https://bintray.com/requery/requery/sqlite-android/_latestVersion)
 
 This is an Android specific distribution of the latest versions of SQLite. It contains the latest
