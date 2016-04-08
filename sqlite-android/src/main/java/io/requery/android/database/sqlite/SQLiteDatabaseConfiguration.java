@@ -18,6 +18,7 @@
 package io.requery.android.database.sqlite;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -87,7 +88,12 @@ public final class SQLiteDatabaseConfiguration {
     /**
      * The custom functions to register.
      */
-    public final ArrayList<SQLiteCustomFunction> customFunctions = new ArrayList<>();
+    public final List<SQLiteCustomFunction> customFunctions = new ArrayList<>();
+
+    /**
+     * The custom extensions to register.
+     */
+    public final List<SQLiteCustomExtension> customExtensions = new ArrayList<>();
 
     /**
      * Creates a database configuration with the required parameters for opening a
@@ -111,11 +117,28 @@ public final class SQLiteDatabaseConfiguration {
     }
 
     /**
+     * Creates a database configuration with the required parameters for opening a
+     * database and default values for all other parameters.
+     *
+     * @param path The database path.
+     * @param openFlags Open flags for the database, such as {@link SQLiteDatabase#OPEN_READWRITE}.
+     * @param functions custom functions to use.
+     * @param extensions custom extensions to use.
+     */
+    public SQLiteDatabaseConfiguration(String path, int openFlags,
+                                       List<SQLiteCustomFunction> functions,
+                                       List<SQLiteCustomExtension> extensions) {
+        this(path, openFlags);
+        this.customFunctions.addAll(functions);
+        this.customExtensions.addAll(extensions);
+    }
+
+    /**
      * Creates a database configuration as a copy of another configuration.
      *
      * @param other The other configuration.
      */
-    public SQLiteDatabaseConfiguration(SQLiteDatabaseConfiguration other) {
+    SQLiteDatabaseConfiguration(SQLiteDatabaseConfiguration other) {
         if (other == null) {
             throw new IllegalArgumentException("other must not be null.");
         }
@@ -131,7 +154,7 @@ public final class SQLiteDatabaseConfiguration {
      *
      * @param other The object from which to copy the parameters.
      */
-    public void updateParametersFrom(SQLiteDatabaseConfiguration other) {
+    void updateParametersFrom(SQLiteDatabaseConfiguration other) {
         if (other == null) {
             throw new IllegalArgumentException("other must not be null.");
         }
@@ -146,6 +169,8 @@ public final class SQLiteDatabaseConfiguration {
         foreignKeyConstraintsEnabled = other.foreignKeyConstraintsEnabled;
         customFunctions.clear();
         customFunctions.addAll(other.customFunctions);
+        customExtensions.clear();
+        customExtensions.addAll(other.customExtensions);
     }
 
     /**

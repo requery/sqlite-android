@@ -824,6 +824,26 @@ static jboolean nativeHasCodec(JNIEnv* env, jobject clazz){
 #endif
 }
 
+static void nativeLoadExtension(JNIEnv* env, jobject clazz,
+                                jlong connectionPtr, jstring file, jstring proc) {
+    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    jint result = sqlite3_enable_load_extension(connection->db, 1);
+    if (result == SQLITE_OK) {
+        const char* fileChars = env->GetStringUTFChars(file, NULL);
+        const char* procChars = NULL;
+        if (proc) {
+            procChars = env->GetStringUTFChars(proc, NULL);
+        }
+        result = sqlite3_load_extension(connection->db, fileChars, procChars, 0);
+        env->ReleaseStringUTFChars(file, fileChars);
+        if (proc) {
+            env->ReleaseStringUTFChars(proc, procChars);
+        }
+    }
+    if (result != SQLITE_OK) {
+        throw_sqlite3_exception_errcode(env, result, "Could not register extension");
+    }
+}
 
 static JNINativeMethod sMethods[] =
 {
@@ -880,8 +900,10 @@ static JNINativeMethod sMethods[] =
             (void*)nativeCancel },
     { "nativeResetCancel", "(JZ)V",
             (void*)nativeResetCancel },
-
-    { "nativeHasCodec", "()Z", (void*)nativeHasCodec },
+    { "nativeHasCodec", "()Z",
+            (void*)nativeHasCodec },
+    { "nativeLoadExtension", "(JLjava/lang/String;Ljava/lang/String;)V",
+            (void*)nativeLoadExtension },
 };
 
 #define FIND_CLASS(var, className) \

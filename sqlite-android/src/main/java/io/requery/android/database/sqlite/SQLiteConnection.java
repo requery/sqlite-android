@@ -164,6 +164,8 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     private static native void nativeResetCancel(long connectionPtr, boolean cancelable);
 
     private static native boolean nativeHasCodec();
+    private static native void nativeLoadExtension(long connectionPtr, String file, String proc);
+
     public static boolean hasCodec(){ return nativeHasCodec(); }
 
     private SQLiteConnection(SQLiteConnectionPool pool,
@@ -223,17 +225,22 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
         setPageSize();
         setForeignKeyModeFromConfiguration();
         setJournalSizeLimit();
-	setAutoCheckpointInterval();
-	if( !nativeHasCodec() ){
-	  setWalModeFromConfiguration();
-          setLocaleFromConfiguration();
-	}
+        setAutoCheckpointInterval();
+        if (!nativeHasCodec()) {
+            setWalModeFromConfiguration();
+            setLocaleFromConfiguration();
+        }
 
         // Register custom functions.
         final int functionCount = mConfiguration.customFunctions.size();
         for (int i = 0; i < functionCount; i++) {
             SQLiteCustomFunction function = mConfiguration.customFunctions.get(i);
             nativeRegisterCustomFunction(mConnectionPtr, function);
+        }
+
+        // Register custom extensions
+        for (SQLiteCustomExtension extension : mConfiguration.customExtensions) {
+            nativeLoadExtension(mConnectionPtr, extension.path, extension.entryPoint);
         }
     }
 

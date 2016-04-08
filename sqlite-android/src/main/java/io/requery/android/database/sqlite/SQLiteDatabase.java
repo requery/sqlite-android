@@ -258,11 +258,12 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public static final int MAX_SQL_CACHE_SIZE = 100;
 
-    private SQLiteDatabase(String path, int openFlags, CursorFactory cursorFactory,
-            DatabaseErrorHandler errorHandler) {
+    private SQLiteDatabase(SQLiteDatabaseConfiguration configuration,
+                           CursorFactory cursorFactory,
+                           DatabaseErrorHandler errorHandler) {
         mCursorFactory = cursorFactory;
         mErrorHandler = errorHandler != null ? errorHandler : new DefaultDatabaseErrorHandler();
-        mConfigurationLocked = new SQLiteDatabaseConfiguration(path, openFlags);
+        mConfigurationLocked = configuration;
     }
 
     @SuppressWarnings("ThrowFromFinallyBlock")
@@ -648,7 +649,34 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public static SQLiteDatabase openDatabase(String path, CursorFactory factory, int flags,
             DatabaseErrorHandler errorHandler) {
-        SQLiteDatabase db = new SQLiteDatabase(path, flags, factory, errorHandler);
+        SQLiteDatabaseConfiguration configuration = new SQLiteDatabaseConfiguration(path, flags);
+        SQLiteDatabase db = new SQLiteDatabase(configuration, factory, errorHandler);
+        db.open();
+        return db;
+    }
+
+    /**
+     * Open the database according to the flags {@link #OPEN_READWRITE}
+     * {@link #OPEN_READONLY} {@link #CREATE_IF_NECESSARY} and/or {@link #NO_LOCALIZED_COLLATORS}.
+     *
+     * <p>Sets the locale of the database to the  the system's current locale.
+     * Call {@link #setLocale} if you would like something else.</p>
+     *
+     * <p>Accepts input param: a concrete instance of {@link DatabaseErrorHandler} to be
+     * used to handle corruption when sqlite reports database corruption.</p>
+     *
+     * @param configuration to database configuration to use
+     * @param factory an optional factory class that is called to instantiate a
+     *            cursor when query is called, or null for default
+     * @param errorHandler the {@link DatabaseErrorHandler} obj to be used to handle corruption
+     * when sqlite reports database corruption
+     * @return the newly opened database
+     * @throws SQLiteException if the database cannot be opened
+     */
+    public static SQLiteDatabase openDatabase(SQLiteDatabaseConfiguration configuration,
+                                              CursorFactory factory,
+                                              DatabaseErrorHandler errorHandler) {
+        SQLiteDatabase db = new SQLiteDatabase(configuration, factory, errorHandler);
         db.open();
         return db;
     }
