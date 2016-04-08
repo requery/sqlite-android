@@ -300,9 +300,9 @@ static void nativeRegisterCustomFunction(JNIEnv* env, jclass clazz, jlong connec
 static void nativeRegisterLocalizedCollators(JNIEnv* env, jclass clazz, jlong connectionPtr,
         jstring localeStr) {
     SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-
-    const char* locale = env->GetStringUTFChars(localeStr, NULL);
 #if 0
+    const char* locale = env->GetStringUTFChars(localeStr, NULL);
+
     int err = register_localized_collators(connection->db, locale, UTF16_STORAGE);
     env->ReleaseStringUTFChars(localeStr, locale);
 
