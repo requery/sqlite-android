@@ -409,7 +409,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * </pre>
      */
     public void beginTransaction() {
-        beginTransaction(null /* transactionStatusCallback */, true);
+        beginTransaction(null, SQLiteSession.TRANSACTION_MODE_EXCLUSIVE);
     }
 
     /**
@@ -433,7 +433,26 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * </pre>
      */
     public void beginTransactionNonExclusive() {
-        beginTransaction(null /* transactionStatusCallback */, false);
+        beginTransaction(null, SQLiteSession.TRANSACTION_MODE_IMMEDIATE);
+    }
+
+    /**
+     * Begins a transaction in DEFERRED mode.
+     */
+    public void beginTransactionDeferred() {
+        beginTransaction(null, SQLiteSession.TRANSACTION_MODE_DEFERRED);
+    }
+
+    /**
+     * Begins a transaction in DEFERRED mode.
+     *
+     * @param transactionListener listener that should be notified when the transaction begins,
+     * commits, or is rolled back, either explicitly or by a call to
+     * {@link #yieldIfContendedSafely}.
+     */
+    public void beginTransactionWithListenerDeferred(
+            SQLiteTransactionListener transactionListener) {
+        beginTransaction(transactionListener, SQLiteSession.TRANSACTION_MODE_DEFERRED);
     }
 
     /**
@@ -462,7 +481,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * {@link #yieldIfContendedSafely}.
      */
     public void beginTransactionWithListener(SQLiteTransactionListener transactionListener) {
-        beginTransaction(transactionListener, true);
+        beginTransaction(transactionListener, SQLiteSession.TRANSACTION_MODE_EXCLUSIVE);
     }
 
     /**
@@ -491,17 +510,13 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public void beginTransactionWithListenerNonExclusive(
             SQLiteTransactionListener transactionListener) {
-        beginTransaction(transactionListener, false);
+        beginTransaction(transactionListener, SQLiteSession.TRANSACTION_MODE_IMMEDIATE);
     }
 
-    private void beginTransaction(SQLiteTransactionListener transactionListener,
-            boolean exclusive) {
+    private void beginTransaction(SQLiteTransactionListener transactionListener, int mode) {
         acquireReference();
         try {
-            getThreadSession().beginTransaction(
-                    exclusive ? SQLiteSession.TRANSACTION_MODE_EXCLUSIVE :
-                            SQLiteSession.TRANSACTION_MODE_IMMEDIATE,
-                    transactionListener,
+            getThreadSession().beginTransaction(mode, transactionListener,
                     getThreadDefaultConnectionFlags(false /*readOnly*/), null);
         } finally {
             releaseReference();
