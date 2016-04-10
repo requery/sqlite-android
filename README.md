@@ -121,6 +121,7 @@ Changes
 - Fix removed members in AbstractWindowCursor
 - Made the AOSP code (mostly) warning free but still mergable from source
 - Deprecated classes/methods removed
+- Loadable extension support
 
 License
 -------
