@@ -43,7 +43,6 @@ LOCAL_SRC_FILES:= \
 	android_database_CursorWindow.cpp \
 	CursorWindow.cpp \
 	JNIHelp.cpp \
-	JniConstants.cpp \
 	JNIString.cpp
 
 LOCAL_SRC_FILES += sqlite3.c
