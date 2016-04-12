@@ -28,13 +28,9 @@ import io.requery.android.database.CursorWindow;
  * SQLiteCursor is not internally synchronized so code using a SQLiteCursor from multiple
  * threads should perform its own synchronization when using the SQLiteCursor.
  */
-@SuppressWarnings("unused")
 public class SQLiteCursor extends AbstractWindowedCursor {
     static final String TAG = "SQLiteCursor";
     static final int NO_COUNT = -1;
-
-    /** The name of the table to edit */
-    private final String mEditTable;
 
     /** The names of the columns in the rows */
     private final String[] mColumns;
@@ -55,7 +51,7 @@ public class SQLiteCursor extends AbstractWindowedCursor {
     private SparseIntArray mColumnNameMap;
 
     /** Used to find out where a cursor was allocated in case it never got released. */
-    //private final Throwable mStackTrace;
+    private final CloseGuard mCloseGuard;
 
     /**
      * Execute a query and provide access to its result set through a Cursor
@@ -64,18 +60,19 @@ public class SQLiteCursor extends AbstractWindowedCursor {
      * phone) would be in the projection argument and everything from
      * {@code FROM} onward would be in the params argument.
      *
-     * @param editTable the name of the table used for this query
-     * @param query the {@link SQLiteQuery} object associated with this cursor object.
+     * @param editTable not used, present only for compatibility with
+     *                  {@link android.database.sqlite.SQLiteCursor}
+     * @param query     the {@link SQLiteQuery} object associated with this cursor object.
      */
+    @SuppressWarnings("unused")
     public SQLiteCursor(SQLiteCursorDriver driver, String editTable, SQLiteQuery query) {
         if (query == null) {
             throw new IllegalArgumentException("query object cannot be null");
         }
         mDriver = driver;
-        mEditTable = editTable;
         mColumnNameMap = null;
         mQuery = query;
-
+        mCloseGuard = CloseGuard.get();
         mColumns = query.getColumnNames();
     }
 
@@ -231,6 +228,7 @@ public class SQLiteCursor extends AbstractWindowedCursor {
         try {
             // if the cursor hasn't been closed yet, close it first
             if (mWindow != null) {
+                mCloseGuard.warnIfOpen();
                 close();
             }
         } finally {
