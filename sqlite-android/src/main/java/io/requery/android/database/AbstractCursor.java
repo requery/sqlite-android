@@ -30,11 +30,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
+
 /**
  * This is an abstract cursor class that handles a lot of the common code
  * that all cursors need to deal with and is provided for convenience reasons.
  */
-@SuppressWarnings("unused")
 public abstract class AbstractCursor implements Cursor {
 
     private static final String TAG = "Cursor";
@@ -43,8 +44,14 @@ public abstract class AbstractCursor implements Cursor {
 
     protected boolean mClosed;
 
-    private final Object mSelfObserverLock = new Object();
+    //@Deprecated // deprecated in AOSP but still used for non-deprecated methods
+    protected ContentResolver mContentResolver;
 
+    private Uri mNotifyUri;
+
+    private final Object mSelfObserverLock = new Object();
+    private ContentObserver mSelfObserver;
+    private boolean mSelfObserverRegistered;
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
     private final ContentObservable mContentObservable = new ContentObservable();
 
@@ -91,11 +98,19 @@ public abstract class AbstractCursor implements Cursor {
 
     /** @hide */
     protected void onDeactivateOrClose() {
+        if (mSelfObserver != null) {
+            mContentResolver.unregisterContentObserver(mSelfObserver);
+            mSelfObserverRegistered = false;
+        }
         mDataSetObservable.notifyInvalidated();
     }
 
     @Override
     public boolean requery() {
+        if (mSelfObserver != null && !mSelfObserverRegistered) {
+            mContentResolver.registerContentObserver(mNotifyUri, true, mSelfObserver);
+            mSelfObserverRegistered = true;
+        }
         mDataSetObservable.notifyChanged();
         return true;
     }
@@ -298,6 +313,9 @@ public abstract class AbstractCursor implements Cursor {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 mContentObservable.dispatchChange(selfChange, null);
             }
+            if (mNotifyUri != null && selfChange) {
+                mContentResolver.notifyChange(mNotifyUri, mSelfObserver);
+            }
         }
     }
 
@@ -310,11 +328,23 @@ public abstract class AbstractCursor implements Cursor {
      */
     @Override
     public void setNotificationUri(ContentResolver cr, Uri notifyUri) {
+        synchronized (mSelfObserverLock) {
+            mNotifyUri = notifyUri;
+            mContentResolver = cr;
+            if (mSelfObserver != null) {
+                mContentResolver.unregisterContentObserver(mSelfObserver);
+            }
+            mSelfObserver = new  SelfContentObserver(this);
+            mContentResolver.registerContentObserver(mNotifyUri, true, mSelfObserver);
+            mSelfObserverRegistered = true;
+        }
     }
 
     @Override
     public Uri getNotificationUri() {
-        return null;
+        synchronized (mSelfObserverLock) {
+            return mNotifyUri;
+        }
     }
 
     @Override
@@ -353,8 +383,36 @@ public abstract class AbstractCursor implements Cursor {
     @SuppressWarnings("FinalizeDoesntCallSuperFinalize")
     @Override
     protected void finalize() {
+        if (mSelfObserver != null && mSelfObserverRegistered) {
+            mContentResolver.unregisterContentObserver(mSelfObserver);
+        }
         try {
             if (!mClosed) close();
         } catch(Exception ignored) { }
+    }
+
+    /**
+     * Cursors use this class to track changes others make to their URI.
+     */
+    protected static class SelfContentObserver extends ContentObserver {
+        WeakReference<AbstractCursor> mCursor;
+
+        public SelfContentObserver(AbstractCursor cursor) {
+            super(null);
+            mCursor = new WeakReference<>(cursor);
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return false;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            AbstractCursor cursor = mCursor.get();
+            if (cursor != null) {
+                cursor.onChange(false);
+            }
+        }
     }
 }
