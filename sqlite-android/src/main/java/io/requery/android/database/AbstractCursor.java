@@ -312,6 +312,8 @@ public abstract class AbstractCursor implements Cursor {
         synchronized (mSelfObserverLock) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 mContentObservable.dispatchChange(selfChange, null);
+            } else {
+                mContentObservable.dispatchChange(selfChange);
             }
             if (mNotifyUri != null && selfChange) {
                 mContentResolver.notifyChange(mNotifyUri, mSelfObserver);
