@@ -21,6 +21,7 @@
 
 package io.requery.android.database.sqlite;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -29,6 +30,7 @@ import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteTransactionListener;
 import android.os.Looper;
+import android.support.annotation.IntDef;
 import android.support.v4.os.CancellationSignal;
 import android.support.v4.os.OperationCanceledException;
 import android.text.TextUtils;
@@ -41,6 +43,8 @@ import io.requery.android.database.DefaultDatabaseErrorHandler;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -67,12 +71,14 @@ import java.util.WeakHashMap;
  * to the current locale.
  * </p>
  */
-@SuppressWarnings(
-    {"unused", "JavaDoc", "TryFinallyCanBeTryWithResources", "ForLoopReplaceableByForEach"})
+@SuppressWarnings({"unused", "JavaDoc", "TryFinallyCanBeTryWithResources"})
+@SuppressLint("ShiftFlags") // suppressed for readability with native code
 public final class SQLiteDatabase extends SQLiteClosable {
+
     static {
         System.loadLibrary("sqlite3x");
     }
+
     private static final String TAG = "SQLiteDatabase";
 
     private static final int EVENT_DB_CORRUPT = 75004;
@@ -187,6 +193,18 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public static final int CONFLICT_NONE = 0;
 
+    /** Conflict options integer enumeration definition */
+    @IntDef({
+        CONFLICT_ABORT,
+        CONFLICT_FAIL,
+        CONFLICT_IGNORE,
+        CONFLICT_NONE,
+        CONFLICT_REPLACE,
+        CONFLICT_ROLLBACK})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ConflictAlgorithm {
+    }
+
     private static final String[] CONFLICT_VALUES = new String[]
             {"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
@@ -220,8 +238,6 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public static final int OPEN_READONLY = 0x00000001;           // update native code if changing
 
-    private static final int OPEN_READ_MASK = 0x00000001;         // update native code if changing
-
     /**
      * Open flag: Flag for {@link #openDatabase} to open the database without support for
      * localized collators.
@@ -249,6 +265,17 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @see #enableWriteAheadLogging
      */
     public static final int ENABLE_WRITE_AHEAD_LOGGING = 0x20000000;
+
+    /** Integer flag definition for the database open options */
+    @IntDef(flag = true, value = {
+        OPEN_READONLY,
+        OPEN_READWRITE,
+        CREATE_IF_NECESSARY,
+        NO_LOCALIZED_COLLATORS,
+        ENABLE_WRITE_AHEAD_LOGGING})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface OpenFlags {
+    }
 
     /**
      * Absolute max value that can be set by {@link #setMaxSqlCacheSize(int)}.
@@ -639,7 +666,9 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @return the newly opened database
      * @throws SQLiteException if the database cannot be opened
      */
-    public static SQLiteDatabase openDatabase(String path, CursorFactory factory, int flags) {
+    public static SQLiteDatabase openDatabase(String path,
+                                              CursorFactory factory,
+                                              @OpenFlags int flags) {
         return openDatabase(path, factory, flags, null);
     }
 
@@ -662,8 +691,10 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @return the newly opened database
      * @throws SQLiteException if the database cannot be opened
      */
-    public static SQLiteDatabase openDatabase(String path, CursorFactory factory, int flags,
-            DatabaseErrorHandler errorHandler) {
+    public static SQLiteDatabase openDatabase(String path,
+                                              CursorFactory factory,
+                                              @OpenFlags int flags,
+                                              DatabaseErrorHandler errorHandler) {
         SQLiteDatabaseConfiguration configuration = new SQLiteDatabaseConfiguration(path, flags);
         SQLiteDatabase db = new SQLiteDatabase(configuration, factory, errorHandler);
         db.open();
@@ -773,8 +804,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
 
             // Reopen the database in read-write mode.
             final int oldOpenFlags = mConfigurationLocked.openFlags;
-            mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags & ~OPEN_READ_MASK)
-                    | OPEN_READWRITE;
+            mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags & ~OPEN_READONLY);
             try {
                 mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
@@ -1406,7 +1436,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
     public long insertWithOnConflict(String table, String nullColumnHack,
-            ContentValues initialValues, int conflictAlgorithm) {
+            ContentValues initialValues, @ConflictAlgorithm int conflictAlgorithm) {
         acquireReference();
         try {
             StringBuilder sql = new StringBuilder();
@@ -1508,7 +1538,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @return the number of rows affected
      */
     public int updateWithOnConflict(String table, ContentValues values,
-            String whereClause, String[] whereArgs, int conflictAlgorithm) {
+            String whereClause, String[] whereArgs, @ConflictAlgorithm int conflictAlgorithm) {
         if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("Empty values");
         }
@@ -1665,7 +1695,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
     }
 
     private boolean isReadOnlyLocked() {
-        return (mConfigurationLocked.openFlags & OPEN_READ_MASK) == OPEN_READONLY;
+        return (mConfigurationLocked.openFlags & OPEN_READONLY) == OPEN_READONLY;
     }
 
     /**
@@ -2109,8 +2139,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
                 attachedDbs.add(new Pair<>("main", getPath()));
             }
 
-            for (int i = 0; i < attachedDbs.size(); i++) {
-                Pair<String, String> p = attachedDbs.get(i);
+            for (Pair<String, String> p : attachedDbs) {
                 SQLiteStatement prog = null;
                 try {
                     prog = compileStatement("PRAGMA " + p.first + ".integrity_check(1);");

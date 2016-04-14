@@ -61,7 +61,7 @@ public final class SQLiteDatabaseConfiguration {
     /**
      * The flags used to open the database.
      */
-    public int openFlags;
+    public @SQLiteDatabase.OpenFlags int openFlags;
 
     /**
      * The maximum size of the prepared statement cache for each database connection.
@@ -102,7 +102,7 @@ public final class SQLiteDatabaseConfiguration {
      * @param path The database path.
      * @param openFlags Open flags for the database, such as {@link SQLiteDatabase#OPEN_READWRITE}.
      */
-    public SQLiteDatabaseConfiguration(String path, int openFlags) {
+    public SQLiteDatabaseConfiguration(String path, @SQLiteDatabase.OpenFlags int openFlags) {
         if (path == null) {
             throw new IllegalArgumentException("path must not be null.");
         }
@@ -125,7 +125,8 @@ public final class SQLiteDatabaseConfiguration {
      * @param functions custom functions to use.
      * @param extensions custom extensions to use.
      */
-    public SQLiteDatabaseConfiguration(String path, int openFlags,
+    public SQLiteDatabaseConfiguration(String path,
+                                       @SQLiteDatabase.OpenFlags int openFlags,
                                        List<SQLiteCustomFunction> functions,
                                        List<SQLiteCustomExtension> extensions) {
         this(path, openFlags);

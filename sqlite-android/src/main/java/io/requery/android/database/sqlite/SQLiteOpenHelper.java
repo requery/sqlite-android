@@ -215,7 +215,7 @@ public abstract class SQLiteOpenHelper {
             mIsInitializing = true;
 
             if (db != null) {
-                if (writable && db.isReadOnly()) {
+                if (db.isReadOnly()) {
                     db.reopenReadWrite();
                 }
             } else if (mName == null) {
@@ -394,7 +394,8 @@ public abstract class SQLiteOpenHelper {
      * @param openFlags to control database access mode
      * @return {@link SQLiteDatabaseConfiguration} instance, cannot be null.
      */
-    protected SQLiteDatabaseConfiguration createConfiguration(String path, int openFlags) {
+    protected SQLiteDatabaseConfiguration createConfiguration(String path,
+                                                          @SQLiteDatabase.OpenFlags int openFlags) {
         return new SQLiteDatabaseConfiguration(path, openFlags);
     }
 }
