@@ -52,6 +52,9 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4'
 }
 
+publish.dependsOn assembleRelease
+bintrayUpload.dependsOn assembleRelease
+
 ext {
     sqliteDistributionUrl = 'http://www.sqlite.org/2016/sqlite-amalgamation-3120100.zip'
     pomXml = {
@@ -89,9 +92,7 @@ publishing {
             version project.version
             artifact "build/outputs/aar/${project.name}-release.aar"
             artifact sourcesJar
-            artifact(javadocJar) {
-                classifier 'javadoc'
-            }
+            artifact javadocJar
             pom.withXml {
                 asNode().children().last() + project.pomXml
             }
