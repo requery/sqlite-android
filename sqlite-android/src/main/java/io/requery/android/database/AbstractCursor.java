@@ -308,6 +308,7 @@ public abstract class AbstractCursor implements Cursor {
      *
      * @param selfChange value
      */
+    @SuppressWarnings("deprecation")
     protected void onChange(boolean selfChange) {
         synchronized (mSelfObserverLock) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
