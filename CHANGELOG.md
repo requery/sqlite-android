@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 3.12.1-1
+
+- Fix CursorWindow deactivate/close
+- Fix Cursor setNotificationUri not working
+
 ## 3.12.1
 
 - [SQLite 3.12.1](https://www.sqlite.org/releaselog/3_12_1.html)
