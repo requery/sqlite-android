@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## 3.12.2
+
+- [SQLite 3.12.2](https://www.sqlite.org/releaselog/3_12_2.html)
+
 ## 3.12.1-1
 
 - Fix CursorWindow deactivate/close
