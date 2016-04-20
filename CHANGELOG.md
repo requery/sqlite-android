@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## 3.12.2-1
+
+- Fix native error code SQLITE_CANTOPEN(14) creating a database for the first time
+- Fix SQLiteOpenHelper setWriteAheadLoggingEnabled flag not passed to openDatabase
+- Change SQLiteGlobal default config values to match Android defaults
+
 ## 3.12.2
 
 - [SQLite 3.12.2](https://www.sqlite.org/releaselog/3_12_2.html)
