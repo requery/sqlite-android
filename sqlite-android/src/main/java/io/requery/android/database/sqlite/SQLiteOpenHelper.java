@@ -228,8 +228,11 @@ public abstract class SQLiteOpenHelper {
                             createConfiguration(path, SQLiteDatabase.OPEN_READONLY);
                         db = SQLiteDatabase.openDatabase(configuration, mFactory,  mErrorHandler);
                     } else {
+                        int flags = mEnableWriteAheadLogging ?
+                            SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING : 0;
+                        flags |= SQLiteDatabase.CREATE_IF_NECESSARY;
                         SQLiteDatabaseConfiguration configuration =
-                            createConfiguration(path, SQLiteDatabase.CREATE_IF_NECESSARY);
+                            createConfiguration(path, flags);
                         db = SQLiteDatabase.openDatabase(configuration, mFactory, mErrorHandler);
                     }
                 } catch (SQLiteException ex) {
