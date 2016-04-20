@@ -43,6 +43,7 @@ import io.requery.android.database.DefaultDatabaseErrorHandler;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -816,6 +817,9 @@ public final class SQLiteDatabase extends SQLiteClosable {
 
     private void open() {
         try {
+            if (!mConfigurationLocked.isInMemoryDb()) {
+                ensureFile(mConfigurationLocked.path);
+            }
             try {
                 openInner();
             } catch (SQLiteDatabaseCorruptException ex) {
@@ -826,6 +830,22 @@ public final class SQLiteDatabase extends SQLiteClosable {
             Log.e(TAG, "Failed to open database '" + getLabel() + "'.", ex);
             close();
             throw ex;
+        }
+    }
+
+    private static void ensureFile(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            try {
+                if (!file.getParentFile().mkdirs()) {
+                    Log.e(TAG, "Couldn't mkdirs " + file);
+                }
+                if (!file.createNewFile()) {
+                    Log.e(TAG, "Couldn't create " + file);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Couldn't ensure file " + file, e);
+            }
         }
     }
 
