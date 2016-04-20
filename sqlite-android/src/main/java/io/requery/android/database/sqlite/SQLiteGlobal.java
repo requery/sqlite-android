@@ -15,7 +15,7 @@
  */
 // modified from original source see README at the top level of this project
 /*
-** Modified to support SQLite extensions by the SQLite developers: 
+** Modified to support SQLite extensions by the SQLite developers:
 ** sqlite-dev@sqlite.org.
 */
 
@@ -56,6 +56,9 @@ public final class SQLiteGlobal {
         return nativeReleaseMemory();
     }
 
+    // values derived from:
+    // https://android.googlesource.com/platform/frameworks/base.git/+/master/core/res/res/values/config.xml
+
     /**
      * Gets the default page size to use when creating a database.
      */
@@ -73,43 +76,41 @@ public final class SQLiteGlobal {
      * Gets the default journal mode when WAL is not in use.
      */
     public static String getDefaultJournalMode() {
-        return "delete";
+        return "TRUNCATE";
     }
 
     /**
      * Gets the journal size limit in bytes.
      */
     public static int getJournalSizeLimit() {
-        return 10000;
+        return 524288;
     }
 
     /**
      * Gets the default database synchronization mode when WAL is not in use.
      */
     public static String getDefaultSyncMode() {
-        return "normal";
+        return "FULL";
     }
 
     /**
      * Gets the database synchronization mode when in WAL mode.
      */
     public static String getWALSyncMode() {
-        return "normal";
+        return "FULL";
     }
 
     /**
      * Gets the WAL auto-checkpoint integer in database pages.
      */
     public static int getWALAutoCheckpoint() {
-        int value = 1000;
-        return Math.max(1, value);
+        return 100;
     }
 
     /**
      * Gets the connection pool size when in WAL mode.
      */
     public static int getWALConnectionPoolSize() {
-        int value = 10;
-        return Math.max(2, value);
+        return 4;
     }
 }
