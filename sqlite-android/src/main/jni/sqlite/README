@@ -2,7 +2,6 @@
 All the files in this directory are copied from stock android. The following
 files:
 
-JniConstants.cpp
 JNIHelp.cpp
 ALog-priv.h
 
