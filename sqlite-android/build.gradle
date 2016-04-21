@@ -95,6 +95,14 @@ publishing {
             artifact javadocJar
             pom.withXml {
                 asNode().children().last() + project.pomXml
+                def dependencies = asNode().appendNode('dependencies')
+                configurations.compile.allDependencies.each {
+                    def dependency = dependencies.appendNode('dependency')
+                    dependency.appendNode('groupId', it.group)
+                    dependency.appendNode('artifactId', it.name)
+                    dependency.appendNode('version', it.version)
+                    dependency.appendNode('scope', 'compile')
+                }
             }
         }
     }
