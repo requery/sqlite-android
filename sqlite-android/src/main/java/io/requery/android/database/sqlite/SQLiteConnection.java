@@ -22,16 +22,18 @@
 package io.requery.android.database.sqlite;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteException;
+import android.os.Build;
+import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.os.CancellationSignal;
 import android.support.v4.os.OperationCanceledException;
+import android.support.v4.util.LruCache;
 import android.util.Log;
-import android.util.LruCache;
 import android.util.Printer;
 import io.requery.android.database.CursorWindow;
 
@@ -89,7 +91,7 @@ import java.util.regex.Pattern;
  *
  * @hide
  */
-@SuppressWarnings({"unused", "ForLoopReplaceableByForEach", "TryFinallyCanBeTryWithResources"})
+@SuppressWarnings("TryFinallyCanBeTryWithResources")
 public final class SQLiteConnection implements CancellationSignal.OnCancelListener {
     private static final String TAG = "SQLiteConnection";
     private static final boolean DEBUG = false;
@@ -325,12 +327,13 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     }
 
     private static String canonicalizeSyncMode(String value) {
-        if (value.equals("0")) {
-            return "OFF";
-        } else if (value.equals("1")) {
-            return "NORMAL";
-        } else if (value.equals("2")) {
-            return "FULL";
+        switch (value) {
+            case "0":
+                return "OFF";
+            case "1":
+                return "NORMAL";
+            case "2":
+                return "FULL";
         }
         return value;
     }
@@ -345,10 +348,14 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
                 }
                 // PRAGMA journal_mode silently fails and returns the original journal
                 // mode in some cases if the journal mode could not be changed.
-            } catch (SQLiteDatabaseLockedException ex) {
+            } catch (SQLiteException ex) {
                 // This error (SQLITE_BUSY) occurs if one connection has the database
                 // open in WAL mode and another tries to change it to non-WAL.
+                if (!(ex instanceof SQLiteDatabaseLockedException)) {
+                    throw ex;
+                }
             }
+
             // Because we always disable WAL mode when a database is first opened
             // (even if we intend to re-enable it), we can encounter problems if
             // there is another open connection to the database somewhere.
@@ -473,14 +480,6 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     // Returns true if the prepared statement cache contains the specified SQL.
     boolean isPreparedStatementInCache(String sql) {
         return mPreparedStatementCache.get(sql) != null;
-    }
-
-    /**
-     * Gets the unique id of this connection.
-     * @return The connection id.
-     */
-    public int getConnectionId() {
-        return mConnectionId;
     }
 
     /**
@@ -711,7 +710,11 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
                 try {
                     int fd = nativeExecuteForBlobFileDescriptor(
                             mConnectionPtr, statement.mStatementPtr);
-                    return fd >= 0 ? ParcelFileDescriptor.adoptFd(fd) : null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+                        return fd >= 0 ? ParcelFileDescriptor.adoptFd(fd) : null;
+                    } else {
+                        throw new UnsupportedOperationException();
+                    }
                 } finally {
                     detachCancellationSignal(cancellationSignal);
                 }
@@ -918,7 +921,7 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
         final long statementPtr = nativePrepareStatement(mConnectionPtr, sql);
         try {
             final int numParameters = nativeGetParameterCount(mConnectionPtr, statementPtr);
-            final int type = DatabaseUtils.getSqlStatementType(sql);
+            final int type = SQLiteStatementType.getSqlStatementType(sql);
             final boolean readOnly = nativeIsReadOnly(mConnectionPtr, statementPtr);
             statement = obtainPreparedStatement(sql, statementPtr, numParameters, type, readOnly);
             if (!skipCache && isCacheable(type)) {
@@ -1009,9 +1012,13 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     private void bindArguments(PreparedStatement statement, Object[] bindArgs) {
         final int count = bindArgs != null ? bindArgs.length : 0;
         if (count != statement.mNumParameters) {
-            throw new SQLiteBindOrColumnIndexOutOfRangeException(
-                    "Expected " + statement.mNumParameters + " bind arguments but "
-                    + count + " were provided.");
+            String message = "Expected " + statement.mNumParameters + " bind arguments but "
+                + count + " were provided.";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                throw new SQLiteBindOrColumnIndexOutOfRangeException(message);
+            } else {
+                throw new SQLiteException(message);
+            }
         }
         if (count == 0) {
             return;
@@ -1065,6 +1072,7 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
      * @param obj the object whose value type is to be returned
      * @return object value type
      */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static int getTypeOfObject(Object obj) {
         if (obj == null) {
             return Cursor.FIELD_TYPE_NULL;
@@ -1088,15 +1096,21 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     }
 
     private static boolean isCacheable(int statementType) {
-        if (statementType == DatabaseUtils.STATEMENT_UPDATE
-                || statementType == DatabaseUtils.STATEMENT_SELECT) {
-            return true;
-        }
-        return false;
+        return statementType == SQLiteStatementType.STATEMENT_UPDATE
+            || statementType == SQLiteStatementType.STATEMENT_SELECT;
     }
 
     private void applyBlockGuardPolicy(PreparedStatement statement) {
-
+        if (!mConfiguration.isInMemoryDb() && SQLiteDebug.DEBUG_SQL_LOG) {
+            // don't have access to the policy, so just log
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                if (statement.mReadOnly) {
+                    Log.w(TAG, "Reading from disk on main thread");
+                } else {
+                    Log.w(TAG, "Writing to disk on main thread");
+                }
+            }
+        }
     }
 
     /**
@@ -1369,8 +1383,7 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
                     } else {
                         operation.mBindArgs.clear();
                     }
-                    for (int i = 0; i < bindArgs.length; i++) {
-                        final Object arg = bindArgs[i];
+                    for (final Object arg : bindArgs) {
                         if (arg != null && arg instanceof byte[]) {
                             // Don't hold onto the real byte array longer than necessary.
                             operation.mBindArgs.add(EMPTY_BYTE_ARRAY);
@@ -1427,6 +1440,9 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
 
         private void logOperationLocked(int cookie, String detail) {
             final Operation operation = getOperationLocked(cookie);
+            if (operation == null) {
+                return;
+            }
             StringBuilder msg = new StringBuilder();
             operation.describe(msg, false);
             if (detail != null) {

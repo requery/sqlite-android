@@ -72,7 +72,6 @@ import java.util.concurrent.locks.LockSupport;
  *
  * @hide
  */
-@SuppressWarnings("ForLoopReplaceableByForEach")
 public final class SQLiteConnectionPool implements Closeable {
     private static final String TAG = "SQLiteConnectionPool";
 
@@ -123,7 +122,7 @@ public final class SQLiteConnectionPool implements Closeable {
      * perform read-only operations.
      * </p>
      */
-    public static final int CONNECTION_FLAG_READ_ONLY = 1 << 0;
+    public static final int CONNECTION_FLAG_READ_ONLY = 1;
 
     /**
      * Connection flag: Primary connection affinity.
@@ -510,9 +509,8 @@ public final class SQLiteConnectionPool implements Closeable {
 
     // Can't throw.
     private void closeAvailableNonPrimaryConnectionsAndLogExceptionsLocked() {
-        final int count = mAvailableNonPrimaryConnections.size();
-        for (int i = 0; i < count; i++) {
-            closeConnectionAndLogExceptionsLocked(mAvailableNonPrimaryConnections.get(i));
+        for (SQLiteConnection connection : mAvailableNonPrimaryConnections) {
+            closeConnectionAndLogExceptionsLocked(connection);
         }
         mAvailableNonPrimaryConnections.clear();
     }
@@ -585,9 +583,8 @@ public final class SQLiteConnectionPool implements Closeable {
                     keysToUpdate.add(entry.getKey());
                 }
             }
-            final int updateCount = keysToUpdate.size();
-            for (int i = 0; i < updateCount; i++) {
-                mAcquiredConnections.put(keysToUpdate.get(i), status);
+            for (SQLiteConnection key : keysToUpdate) {
+                mAcquiredConnections.put(key, status);
             }
         }
     }
@@ -1030,9 +1027,8 @@ public final class SQLiteConnectionPool implements Closeable {
 
             printer.println("  Available non-primary connections:");
             if (!mAvailableNonPrimaryConnections.isEmpty()) {
-                final int count = mAvailableNonPrimaryConnections.size();
-                for (int i = 0; i < count; i++) {
-                    mAvailableNonPrimaryConnections.get(i).dump(printer, verbose);
+                for (SQLiteConnection connection : mAvailableNonPrimaryConnections) {
+                    connection.dump(printer, verbose);
                 }
             } else {
                 printer.println("<none>");

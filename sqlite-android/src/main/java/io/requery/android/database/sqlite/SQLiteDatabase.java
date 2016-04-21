@@ -24,7 +24,6 @@ package io.requery.android.database.sqlite;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteException;
@@ -49,6 +48,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -1472,10 +1472,10 @@ public final class SQLiteDatabase extends SQLiteClosable {
             if (size > 0) {
                 bindArgs = new Object[size];
                 int i = 0;
-                for (String colName : initialValues.keySet()) {
+                for (Map.Entry<String, Object> entry : initialValues.valueSet()) {
                     sql.append((i > 0) ? "," : "");
-                    sql.append(colName);
-                    bindArgs[i++] = initialValues.get(colName);
+                    sql.append(entry.getKey());
+                    bindArgs[i++] = entry.getValue();
                 }
                 sql.append(')');
                 sql.append(" VALUES (");
@@ -1576,10 +1576,10 @@ public final class SQLiteDatabase extends SQLiteClosable {
             int bindArgsSize = (whereArgs == null) ? setValuesSize : (setValuesSize + whereArgs.length);
             Object[] bindArgs = new Object[bindArgsSize];
             int i = 0;
-            for (String colName : values.keySet()) {
+            for (Map.Entry<String, Object> entry : values.valueSet()) {
                 sql.append((i > 0) ? "," : "");
-                sql.append(colName);
-                bindArgs[i++] = values.get(colName);
+                sql.append(entry.getKey());
+                bindArgs[i++] = entry.getValue();
                 sql.append("=?");
             }
             if (whereArgs != null) {
@@ -1679,7 +1679,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
     private int executeSql(String sql, Object[] bindArgs) throws SQLException {
         acquireReference();
         try {
-            if (DatabaseUtils.getSqlStatementType(sql) == DatabaseUtils.STATEMENT_ATTACH) {
+            if (SQLiteStatementType.getSqlStatementType(sql) == SQLiteStatementType.STATEMENT_ATTACH) {
                 boolean disableWal = false;
                 synchronized (mLock) {
                     if (!mHasAttachedDbsLocked) {

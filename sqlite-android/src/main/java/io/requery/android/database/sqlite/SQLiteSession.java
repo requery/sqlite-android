@@ -22,7 +22,6 @@
 package io.requery.android.database.sqlite;
 
 import android.annotation.SuppressLint;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteTransactionListener;
 import android.os.ParcelFileDescriptor;
@@ -881,19 +880,19 @@ public final class SQLiteSession {
             cancellationSignal.throwIfCanceled();
         }
 
-        final int type = DatabaseUtils.getSqlStatementType(sql);
+        final int type = SQLiteStatementType.getSqlStatementType(sql);
         switch (type) {
-            case DatabaseUtils.STATEMENT_BEGIN:
+            case SQLiteStatementType.STATEMENT_BEGIN:
                 beginTransaction(TRANSACTION_MODE_EXCLUSIVE, null, connectionFlags,
                         cancellationSignal);
                 return true;
 
-            case DatabaseUtils.STATEMENT_COMMIT:
+            case SQLiteStatementType.STATEMENT_COMMIT:
                 setTransactionSuccessful();
                 endTransaction(cancellationSignal);
                 return true;
 
-            case DatabaseUtils.STATEMENT_ABORT:
+            case SQLiteStatementType.STATEMENT_ABORT:
                 endTransaction(cancellationSignal);
                 return true;
         }

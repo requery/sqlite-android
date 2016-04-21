@@ -119,6 +119,11 @@ void throw_sqlite3_exception(JNIEnv* env, int errcode,
             break;
     }
 
+    // check this exception class exists otherwise just default to SQLiteException
+    if (env->FindClass(exceptionClass) == NULL) {
+        exceptionClass = "android/database/sqlite/SQLiteException";
+    }
+
     if (sqlite3Message) {
         char *zFullmsg = sqlite3_mprintf(
             "%s (code %d)%s%s", sqlite3Message, errcode, 
