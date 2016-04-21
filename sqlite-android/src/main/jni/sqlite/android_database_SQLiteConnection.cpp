@@ -827,7 +827,7 @@ static jboolean nativeHasCodec(JNIEnv* env, jobject clazz){
 static void nativeLoadExtension(JNIEnv* env, jobject clazz,
                                 jlong connectionPtr, jstring file, jstring proc) {
     SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    jint result = sqlite3_enable_load_extension(connection->db, 1);
+    int result = sqlite3_enable_load_extension(connection->db, 1);
     if (result == SQLITE_OK) {
         const char* fileChars = env->GetStringUTFChars(file, NULL);
         const char* procChars = NULL;
