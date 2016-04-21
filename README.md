@@ -45,7 +45,7 @@ Usage
 
 ```gradle
 dependencies {
-    compile 'io.requery:sqlite-android:3.12.2-1'
+    compile 'io.requery:sqlite-android:3.12.2-2'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -84,6 +84,11 @@ The size of the artifacts with only the armeabi-v7a binary is **~500kb**. In gen
 armeabi-v7a on the majority of Android devices including Intel Atom which provides a native
 translation layer, however performance under the translation layer is worse than using the x86
 binary.
+
+Requirements
+------------
+
+The min SDK level is API level 9 (Gingerbread).
 
 Versioning
 ----------

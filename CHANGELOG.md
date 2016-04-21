@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 3.12.2-2
+
+- Minimum API level supported is now 9 (Gingerbread) previously was 15 (ICS)
+- Fix missing support lib dependency missing from maven POM publish
+
 ## 3.12.2-1
 
 - Fix native error code SQLITE_CANTOPEN(14) creating a database for the first time
