@@ -173,19 +173,16 @@ inline void jniLogException(JNIEnv* env, int priority, const char* tag, jthrowab
 
 #endif
 
-/*
- * TEMP_FAILURE_RETRY is defined by some, but not all, versions of
- * <unistd.h>. (Alas, it is not as standard as we'd hoped!) So, if it's
- * not already defined, then define it here.
- */
-#ifndef TEMP_FAILURE_RETRY
-/* Used to retry syscalls that can return EINTR. */
-#define TEMP_FAILURE_RETRY(exp) ({         \
-    typeof (exp) _rc;                      \
-    do {                                   \
-        _rc = (exp);                       \
-    } while (_rc == -1 && errno == EINTR); \
-    _rc; })
-#endif
+#define FIND_CLASS(var, className) \
+        var = env->FindClass(className); \
+        LOG_FATAL_IF(! var, "Unable to find class " className);
+
+#define GET_METHOD_ID(var, clazz, methodName, fieldDescriptor) \
+        var = env->GetMethodID(clazz, methodName, fieldDescriptor); \
+        LOG_FATAL_IF(! var, "Unable to find method" methodName);
+
+#define GET_FIELD_ID(var, clazz, fieldName, fieldDescriptor) \
+        var = env->GetFieldID(clazz, fieldName, fieldDescriptor); \
+        LOG_FATAL_IF(! var, "Unable to find field " fieldName);
 
 #endif  /* NATIVEHELPER_JNIHELP_H_ */
