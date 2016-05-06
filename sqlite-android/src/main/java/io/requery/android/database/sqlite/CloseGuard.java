@@ -228,7 +228,7 @@ public final class CloseGuard {
      */
     private static final class DefaultReporter implements Reporter {
         @Override public void report (String message, Throwable allocationSite) {
-            Log.w(message, allocationSite);
+            Log.w("SQLite", message, allocationSite);
         }
     }
 }
