@@ -17,10 +17,12 @@
 
 package io.requery.android.database;
 
+import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.os.Build;
 import android.test.AndroidTestCase;
 import android.test.PerformanceTestCase;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -85,6 +87,7 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
         mDatabase.execSQL("INSERT INTO test (data) VALUES ('" + sString3 + "');");
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @MediumTest
     public void testBlob() throws Exception {
         // create table
@@ -115,7 +118,7 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
         String[] columns = c.getColumnNames();
         int length = columns.length;
         for (int i = 0; i < length; i++) {
-            if (c != null && c.getType(i) == Cursor.FIELD_TYPE_BLOB) {
+            if (c.getType(i) == Cursor.FIELD_TYPE_BLOB) {
                 cv.put(columns[i], c.getBlob(i));
             } else {
                 cv.put(columns[i], c.getString(i));
@@ -130,7 +133,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
         assertTrue(Arrays.equals(blob, cBlob));
         assertEquals(s, c.getString(sCol));
         assertEquals(d, c.getDouble(dCol));
-        assertEquals((long)l, c.getLong(lCol));        
+        assertEquals((long)l, c.getLong(lCol));
+        c.close();
     }
     
     @MediumTest
