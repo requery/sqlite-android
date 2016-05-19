@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 3.13.0
+
+- [SQLite 3.13.0](https://www.sqlite.org/releaselog/3_13_0.html)
+- Updated proguard rules
+
 ## 3.12.2-2
 
 - Minimum API level supported is now 9 (Gingerbread) previously was 15 (ICS)
