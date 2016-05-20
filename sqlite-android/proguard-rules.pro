@@ -1,4 +1,4 @@
--keepclasseswithmembers io.requery.android.database.** {
+-keepclasseswithmembers class io.requery.android.database.** {
   native <methods>;
   public <init>(...);
 }
