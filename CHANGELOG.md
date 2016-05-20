@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## 3.13.0-1
+
+- Fix proguard rules file
+
 ## 3.13.0
 
 - [SQLite 3.13.0](https://www.sqlite.org/releaselog/3_13_0.html)
