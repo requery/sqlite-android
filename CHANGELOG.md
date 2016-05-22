@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## 3.13.0-2
+
+- More proguard rules fixes
+
 ## 3.13.0-1
 
 - Fix proguard rules file

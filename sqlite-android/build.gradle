@@ -10,7 +10,7 @@ apply plugin: 'com.jfrog.bintray'
 import de.undercouch.gradle.tasks.download.Download
 
 group = 'io.requery'
-version = '3.13.0-1'
+version = '3.13.0-2'
 description = 'Android SQLite compatibility library'
 
 gradle.projectsEvaluated {
