@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## 3.13.0-3
+
+- Support x86_64 target
+
 ## 3.13.0-2
 
 - More proguard rules fixes
