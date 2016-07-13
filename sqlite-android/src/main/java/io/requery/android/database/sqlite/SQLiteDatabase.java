@@ -1030,7 +1030,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *            will return all rows for the given table.
      * @param selectionArgs You may include ?s in selection, which will be
      *         replaced by the values from selectionArgs, in order that they
-     *         appear in the selection. The values will be bound as Strings.
+     *         appear in the selection.
      * @param groupBy A filter declaring how to group rows, formatted as an SQL
      *            GROUP BY clause (excluding the GROUP BY itself). Passing null
      *            will cause the rows to not be grouped.
@@ -1049,7 +1049,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @see Cursor
      */
     public Cursor query(boolean distinct, String table, String[] columns,
-            String selection, String[] selectionArgs, String groupBy,
+            String selection, Object[] selectionArgs, String groupBy,
             String having, String orderBy, String limit) {
         return queryWithFactory(null, distinct, table, columns, selection, selectionArgs,
                 groupBy, having, orderBy, limit, null);
@@ -1068,7 +1068,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *            will return all rows for the given table.
      * @param selectionArgs You may include ?s in selection, which will be
      *         replaced by the values from selectionArgs, in order that they
-     *         appear in the selection. The values will be bound as Strings.
+     *         appear in the selection.
      * @param groupBy A filter declaring how to group rows, formatted as an SQL
      *            GROUP BY clause (excluding the GROUP BY itself). Passing null
      *            will cause the rows to not be grouped.
@@ -1090,7 +1090,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @see Cursor
      */
     public Cursor query(boolean distinct, String table, String[] columns,
-            String selection, String[] selectionArgs, String groupBy,
+            String selection, Object[] selectionArgs, String groupBy,
             String having, String orderBy, String limit, CancellationSignal cancellationSignal) {
         return queryWithFactory(null, distinct, table, columns, selection, selectionArgs,
                 groupBy, having, orderBy, limit, cancellationSignal);
@@ -1110,7 +1110,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *            will return all rows for the given table.
      * @param selectionArgs You may include ?s in selection, which will be
      *         replaced by the values from selectionArgs, in order that they
-     *         appear in the selection. The values will be bound as Strings.
+     *         appear in the selection.
      * @param groupBy A filter declaring how to group rows, formatted as an SQL
      *            GROUP BY clause (excluding the GROUP BY itself). Passing null
      *            will cause the rows to not be grouped.
@@ -1130,7 +1130,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public Cursor queryWithFactory(CursorFactory cursorFactory,
             boolean distinct, String table, String[] columns,
-            String selection, String[] selectionArgs, String groupBy,
+            String selection, Object[] selectionArgs, String groupBy,
             String having, String orderBy, String limit) {
         return queryWithFactory(cursorFactory, distinct, table, columns, selection,
                 selectionArgs, groupBy, having, orderBy, limit, null);
@@ -1150,7 +1150,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *            will return all rows for the given table.
      * @param selectionArgs You may include ?s in selection, which will be
      *         replaced by the values from selectionArgs, in order that they
-     *         appear in the selection. The values will be bound as Strings.
+     *         appear in the selection.
      * @param groupBy A filter declaring how to group rows, formatted as an SQL
      *            GROUP BY clause (excluding the GROUP BY itself). Passing null
      *            will cause the rows to not be grouped.
@@ -1173,7 +1173,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      */
     public Cursor queryWithFactory(CursorFactory cursorFactory,
             boolean distinct, String table, String[] columns,
-            String selection, String[] selectionArgs, String groupBy,
+            String selection, Object[] selectionArgs, String groupBy,
             String having, String orderBy, String limit, CancellationSignal cancellationSignal) {
         acquireReference();
         try {
@@ -1199,7 +1199,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *            will return all rows for the given table.
      * @param selectionArgs You may include ?s in selection, which will be
      *         replaced by the values from selectionArgs, in order that they
-     *         appear in the selection. The values will be bound as Strings.
+     *         appear in the selection.
      * @param groupBy A filter declaring how to group rows, formatted as an SQL
      *            GROUP BY clause (excluding the GROUP BY itself). Passing null
      *            will cause the rows to not be grouped.
@@ -1216,7 +1216,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @see Cursor
      */
     public Cursor query(String table, String[] columns, String selection,
-            String[] selectionArgs, String groupBy, String having,
+            Object[] selectionArgs, String groupBy, String having,
             String orderBy) {
 
         return query(false, table, columns, selection, selectionArgs, groupBy,
@@ -1235,7 +1235,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *            will return all rows for the given table.
      * @param selectionArgs You may include ?s in selection, which will be
      *         replaced by the values from selectionArgs, in order that they
-     *         appear in the selection. The values will be bound as Strings.
+     *         appear in the selection.
      * @param groupBy A filter declaring how to group rows, formatted as an SQL
      *            GROUP BY clause (excluding the GROUP BY itself). Passing null
      *            will cause the rows to not be grouped.
@@ -1266,12 +1266,11 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *
      * @param sql the SQL query. The SQL string must not be ; terminated
      * @param selectionArgs You may include ?s in where clause in the query,
-     *     which will be replaced by the values from selectionArgs. The
-     *     values will be bound as Strings.
+     *     which will be replaced by the values from selectionArgs.
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
-    public Cursor rawQuery(String sql, String[] selectionArgs) {
+    public Cursor rawQuery(String sql, Object[] selectionArgs) {
         return rawQueryWithFactory(null, sql, selectionArgs, null, null);
     }
 
@@ -1280,15 +1279,14 @@ public final class SQLiteDatabase extends SQLiteClosable {
      *
      * @param sql the SQL query. The SQL string must not be ; terminated
      * @param selectionArgs You may include ?s in where clause in the query,
-     *     which will be replaced by the values from selectionArgs. The
-     *     values will be bound as Strings.
+     *     which will be replaced by the values from selectionArgs.
      * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
      * If the operation is canceled, then {@link OperationCanceledException} will be thrown
      * when the query is executed.
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
-    public Cursor rawQuery(String sql, String[] selectionArgs,
+    public Cursor rawQuery(String sql, Object[] selectionArgs,
             CancellationSignal cancellationSignal) {
         return rawQueryWithFactory(null, sql, selectionArgs, null, cancellationSignal);
     }
@@ -1299,14 +1297,13 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @param cursorFactory the cursor factory to use, or null for the default factory
      * @param sql the SQL query. The SQL string must not be ; terminated
      * @param selectionArgs You may include ?s in where clause in the query,
-     *     which will be replaced by the values from selectionArgs. The
-     *     values will be bound as Strings.
+     *     which will be replaced by the values from selectionArgs.
      * @param editTable the name of the first table, which is editable
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     public Cursor rawQueryWithFactory(
-            CursorFactory cursorFactory, String sql, String[] selectionArgs,
+            CursorFactory cursorFactory, String sql, Object[] selectionArgs,
             String editTable) {
         return rawQueryWithFactory(cursorFactory, sql, selectionArgs, editTable, null);
     }
@@ -1317,8 +1314,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @param cursorFactory the cursor factory to use, or null for the default factory
      * @param sql the SQL query. The SQL string must not be ; terminated
      * @param selectionArgs You may include ?s in where clause in the query,
-     *     which will be replaced by the values from selectionArgs. The
-     *     values will be bound as Strings.
+     *     which will be replaced by the values from selectionArgs.
      * @param editTable the name of the first table, which is editable
      * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
      * If the operation is canceled, then {@link OperationCanceledException} will be thrown
@@ -1327,7 +1323,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     public Cursor rawQueryWithFactory(
-            CursorFactory cursorFactory, String sql, String[] selectionArgs,
+            CursorFactory cursorFactory, String sql, Object[] selectionArgs,
             String editTable, CancellationSignal cancellationSignal) {
         acquireReference();
         try {

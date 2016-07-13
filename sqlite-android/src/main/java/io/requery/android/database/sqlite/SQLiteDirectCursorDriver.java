@@ -40,12 +40,10 @@ public final class SQLiteDirectCursorDriver implements SQLiteCursorDriver {
         mCancellationSignal = cancellationSignal;
     }
 
-    public Cursor query(SQLiteDatabase.CursorFactory factory, String[] selectionArgs) {
-        final SQLiteQuery query = new SQLiteQuery(mDatabase, mSql, mCancellationSignal);
+    public Cursor query(SQLiteDatabase.CursorFactory factory, Object[] selectionArgs) {
+        SQLiteQuery query = new SQLiteQuery(mDatabase, mSql, selectionArgs, mCancellationSignal);
         final Cursor cursor;
         try {
-            query.bindAllArgsAsStrings(selectionArgs);
-
             if (factory == null) {
                 cursor = new SQLiteCursor(this, mEditTable, query);
             } else {
@@ -60,18 +58,22 @@ public final class SQLiteDirectCursorDriver implements SQLiteCursorDriver {
         return cursor;
     }
 
+    @Override
     public void cursorClosed() {
         // Do nothing
     }
 
+    @Override
     public void setBindArguments(String[] bindArgs) {
         mQuery.bindAllArgsAsStrings(bindArgs);
     }
 
+    @Override
     public void cursorDeactivated() {
         // Do nothing
     }
 
+    @Override
     public void cursorRequeried(Cursor cursor) {
         // Do nothing
     }
