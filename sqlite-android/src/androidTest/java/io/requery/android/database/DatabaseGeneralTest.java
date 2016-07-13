@@ -430,16 +430,6 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
         assertTrue(c.moveToFirst());
         assertEquals("don't forget to handled 's", c.getString(1));
         c.close();
-
-        // make sure code should checking null string properly so that
-        // it won't crash
-        try {
-            mDatabase.query("test", new String[]{"_id"},
-                    "_id=?", new String[]{null}, null, null, null);
-            fail("expected exception not thrown");
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
     }
 
     @Suppress // unicode collator not supported yet
