@@ -47,9 +47,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:24.0.0'
-    androidTestCompile 'com.android.support.test:runner:0.4'
-    androidTestCompile 'com.android.support.test:rules:0.4'
+    compile 'com.android.support:support-v4:24.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
 }
 
 publish.dependsOn assembleRelease
