@@ -2200,13 +2200,16 @@ public final class SQLiteDatabase extends SQLiteClosable {
     }
 
     /**
-     * A callback interface for a custom sqlite3 function.
-     * This can be used to create a function that can be called from
-     * sqlite3 database triggers.
-     * @hide
+     * A callback interface for a custom sqlite3 function. This can be used to create a function
+     * that can be called from sqlite3 database triggers.
      */
     public interface CustomFunction {
-        void callback(String[] args);
+        /**
+         * Invoked whenever the function is called.
+         * @param args function arguments
+         * @return String value of the result or null
+         */
+        String callback(String[] args);
     }
 
     static boolean hasCodec() {

@@ -93,6 +93,36 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
     }
 
     @MediumTest
+    public void testCustomFunction() {
+        mDatabase.addCustomFunction("roundFunction", 1, new SQLiteDatabase.CustomFunction() {
+            @Override
+            public String callback(String[] args) {
+                String input = args[0];
+                double value = Double.parseDouble(input);
+                return String.valueOf(Math.round(value));
+            }
+        });
+        Cursor cursor = mDatabase.rawQuery("SELECT roundFunction(3.14)", null);
+        assertTrue(cursor.moveToFirst());
+        int result = cursor.getInt(0);
+        assertSame(3, result);
+    }
+
+    @MediumTest
+    public void testCustomFunctionNoReturn() {
+        mDatabase.addCustomFunction("emptyFunction", 1, new SQLiteDatabase.CustomFunction() {
+            @Override
+            public String callback(String[] args) {
+                return null;
+            }
+        });
+        Cursor cursor = mDatabase.rawQuery("SELECT emptyFunction(3.14)", null);
+        // always empty regardless of if sqlite3_result_null is called or not
+        cursor.moveToFirst();
+        assertSame("", cursor.getString(0));
+    }
+
+    @MediumTest
     public void testVersion() throws Exception {
         assertEquals(CURRENT_DATABASE_VERSION, mDatabase.getVersion());
         mDatabase.setVersion(11);
@@ -217,7 +247,7 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
         temporalPhoneNumbers[1] = phone2;
 
         Cursor cursor = mDatabase.rawQuery(
-                String.format(
+                String.format(Locale.ROOT,
                         "SELECT CASE WHEN PHONE_NUMBERS_EQUAL(?, ?, %d) " +
                         "THEN 'equal' ELSE 'not equal' END",
                         (useStrictComparation ? 1 : 0)),

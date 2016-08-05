@@ -48,7 +48,7 @@ public final class SQLiteCustomFunction {
 
     // Called from native.
     @SuppressWarnings("unused")
-    private void dispatchCallback(String[] args) {
-        callback.callback(args);
+    private String dispatchCallback(String[] args) {
+        return callback.callback(args);
     }
 }

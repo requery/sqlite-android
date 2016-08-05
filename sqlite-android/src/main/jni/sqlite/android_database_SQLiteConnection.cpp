@@ -248,10 +248,20 @@ static void sqliteCustomFunctionCallback(sqlite3_context *context,
             }
         }
 
-        // TODO: Support functions that return values.
-        env->CallVoidMethod(functionObj,
-                gSQLiteCustomFunctionClassInfo.dispatchCallback, argsArray);
-
+        {
+            jobject result = env->CallObjectMethod(functionObj,
+                    gSQLiteCustomFunctionClassInfo.dispatchCallback, argsArray);
+            if (env->ExceptionCheck()) {
+                sqlite3_result_error(context, "Custom function exception", -1);
+            } else if (result == NULL) {
+                sqlite3_result_null(context);
+            } else {
+                jstring str = static_cast<jstring>(result);
+                const char* chars = env->GetStringUTFChars(str, NULL);
+                sqlite3_result_text(context, chars, -1, SQLITE_TRANSIENT);
+                env->ReleaseStringUTFChars(str, chars);
+            }
+        }
 error:
         env->DeleteLocalRef(argsArray);
     }
@@ -916,7 +926,7 @@ int register_android_database_SQLiteConnection(JNIEnv *env)
     GET_FIELD_ID(gSQLiteCustomFunctionClassInfo.numArgs, clazz,
             "numArgs", "I");
     GET_METHOD_ID(gSQLiteCustomFunctionClassInfo.dispatchCallback,
-            clazz, "dispatchCallback", "([Ljava/lang/String;)V");
+            clazz, "dispatchCallback", "([Ljava/lang/String;)Ljava/lang/String;");
 
     FIND_CLASS(clazz, "java/lang/String");
     gStringClassInfo.clazz = jclass(env->NewGlobalRef(clazz));
