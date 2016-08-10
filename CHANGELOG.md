@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## 3.14.0
+
+- [SQLite 3.14.0](https://www.sqlite.org/releaselog/3_14.html)
+- Support return value in `SQLiteDatabase.CustomFunction`
+- Support `Object[]` array in `SQLiteDatabase` query methods
+
 ## 3.13.0-3
 
 - Support x86_64 target
