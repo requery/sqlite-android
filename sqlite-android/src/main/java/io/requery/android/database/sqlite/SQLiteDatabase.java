@@ -137,10 +137,6 @@ public final class SQLiteDatabase extends SQLiteClosable {
     // INVARIANT: Guarded by mLock.
     private SQLiteConnectionPool mConnectionPoolLocked;
 
-    // True if the database has attached databases.
-    // INVARIANT: Guarded by mLock.
-    private boolean mHasAttachedDbsLocked;
-
     /**
      * When a constraint violation occurs, an immediate ROLLBACK occurs,
      * thus ending the current transaction, and the command aborts with a
@@ -1675,19 +1671,6 @@ public final class SQLiteDatabase extends SQLiteClosable {
     private int executeSql(String sql, Object[] bindArgs) throws SQLException {
         acquireReference();
         try {
-            if (SQLiteStatementType.getSqlStatementType(sql) == SQLiteStatementType.STATEMENT_ATTACH) {
-                boolean disableWal = false;
-                synchronized (mLock) {
-                    if (!mHasAttachedDbsLocked) {
-                        mHasAttachedDbsLocked = true;
-                        disableWal = true;
-                    }
-                }
-                if (disableWal) {
-                    disableWriteAheadLogging();
-                }
-            }
-
             SQLiteStatement statement = new SQLiteStatement(this, sql, bindArgs);
             try {
                 return statement.executeUpdateDelete();
@@ -1960,16 +1943,6 @@ public final class SQLiteDatabase extends SQLiteClosable {
                 return false;
             }
 
-            // make sure this database has NO attached databases because sqlite's write-ahead-logging
-            // doesn't work for databases with attached databases
-            if (mHasAttachedDbsLocked) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, "this database: " + mConfigurationLocked.label
-                            + " has attached databases. can't  enable WAL.");
-                }
-                return false;
-            }
-
             mConfigurationLocked.openFlags |= ENABLE_WRITE_AHEAD_LOGGING;
             try {
                 mConnectionPoolLocked.reconfigure(mConfigurationLocked);
@@ -2083,20 +2056,6 @@ public final class SQLiteDatabase extends SQLiteClosable {
         synchronized (mLock) {
             if (mConnectionPoolLocked == null) {
                 return null; // not open
-            }
-
-            if (!mHasAttachedDbsLocked) {
-                // No attached databases.
-                // There is a small window where attached databases exist but this flag is not
-                // set yet.  This can occur when this thread is in a race condition with another
-                // thread that is executing the SQL statement: "attach database <blah> as <foo>"
-                // If this thread is NOT ok with such a race condition (and thus possibly not
-                // receivethe entire list of attached databases), then the caller should ensure
-                // that no thread is executing any SQL statements while a thread is calling this
-                // method.  Typically, this method is called when 'adb bugreport' is done or the
-                // caller wants to collect stats on the database and all its attached databases.
-                attachedDbs.add(new Pair<>("main", mConfigurationLocked.path));
-                return attachedDbs;
             }
 
             acquireReference();
