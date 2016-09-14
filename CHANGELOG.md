@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 3.14.2
+
+- [SQLite 3.14.2](https://www.sqlite.org/releaselog/3_14_2.html)
+- Removed code that disabled WAL when executing a ATTACH statement
+
 ## 3.14.1
 
 - [SQLite 3.14.1](https://www.sqlite.org/releaselog/3_14_1.html)
