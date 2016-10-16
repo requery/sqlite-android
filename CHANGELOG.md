@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## 3.15.0
+
+- [SQLite 3.15.0](https://www.sqlite.org/releaselog/3_15_0.html)
+
 ## 3.14.2
 
 - [SQLite 3.14.2](https://www.sqlite.org/releaselog/3_14_2.html)
