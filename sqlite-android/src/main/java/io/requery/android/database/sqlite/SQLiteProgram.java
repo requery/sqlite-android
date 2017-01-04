@@ -173,6 +173,35 @@ public abstract class SQLiteProgram extends SQLiteClosable {
     }
 
     /**
+     * Binds the given Object to the given SQLiteProgram using the proper
+     * typing. For example, bind numbers as longs/doubles, and everything else
+     * as a string by call toString() on it.
+     *
+     * @param index the 1-based index to bind at
+     * @param value the value to bind
+     */
+    public void bindObject(int index, Object value) {
+        if (value == null) {
+            bindNull(index);
+        } else if (value instanceof Double || value instanceof Float) {
+            bindDouble(index, ((Number)value).doubleValue());
+        } else if (value instanceof Number) {
+            bindLong(index, ((Number)value).longValue());
+        } else if (value instanceof Boolean) {
+            Boolean bool = (Boolean)value;
+            if (bool) {
+                bindLong(index, 1);
+            } else {
+                bindLong(index, 0);
+            }
+        } else if (value instanceof byte[]){
+            bindBlob(index, (byte[]) value);
+        } else {
+            bindString(index, value.toString());
+        }
+    }
+
+    /**
      * Clears all existing bindings. Unset bindings are treated as NULL.
      */
     public void clearBindings() {

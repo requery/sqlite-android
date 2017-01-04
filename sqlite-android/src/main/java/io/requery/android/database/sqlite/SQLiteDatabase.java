@@ -15,7 +15,7 @@
  */
 // modified from original source see README at the top level of this project
 /*
-** Modified to support SQLite extensions by the SQLite developers: 
+** Modified to support SQLite extensions by the SQLite developers:
 ** sqlite-dev@sqlite.org.
 */
 
@@ -29,6 +29,7 @@ import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteTransactionListener;
 import android.os.Looper;
+import android.os.ParcelFileDescriptor;
 import android.support.annotation.IntDef;
 import android.support.v4.os.CancellationSignal;
 import android.support.v4.os.OperationCanceledException;
@@ -906,7 +907,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @return the database version
      */
     public int getVersion() {
-        return ((Long) longForQuery(this, "PRAGMA user_version;", null)).intValue();
+        return ((Long) longForQuery("PRAGMA user_version;", null)).intValue();
     }
 
     /**
@@ -924,7 +925,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @return the new maximum database size
      */
     public long getMaximumSize() {
-        long pageCount = longForQuery(this, "PRAGMA max_page_count;", null);
+        long pageCount = longForQuery("PRAGMA max_page_count;", null);
         return pageCount * getPageSize();
     }
 
@@ -942,8 +943,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
         if ((numBytes % pageSize) != 0) {
             numPages++;
         }
-        long newPageCount = longForQuery(this, "PRAGMA max_page_count = " + numPages,
-                null);
+        long newPageCount = longForQuery("PRAGMA max_page_count = " + numPages, null);
         return newPageCount * pageSize;
     }
 
@@ -953,7 +953,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
      * @return the database page size, in bytes
      */
     public long getPageSize() {
-        return longForQuery(this, "PRAGMA page_size;", null);
+        return longForQuery("PRAGMA page_size;", null);
     }
 
     /**
@@ -2180,11 +2180,49 @@ public final class SQLiteDatabase extends SQLiteClosable {
     }
 
     /**
+     * Query the table for the number of rows in the table.
+     * @param table the name of the table to query
+     * @return the number of rows in the table
+     */
+    public long queryNumEntries(String table) {
+        return queryNumEntries(table, null, null);
+    }
+
+    /**
+     * Query the table for the number of rows in the table.
+     * @param table the name of the table to query
+     * @param selection A filter declaring which rows to return,
+     *              formatted as an SQL WHERE clause (excluding the WHERE itself).
+     *              Passing null will count all rows for the given table
+     * @return the number of rows in the table filtered by the selection
+     */
+    public long queryNumEntries(String table, String selection) {
+        return queryNumEntries(table, selection, null);
+    }
+
+    /**
+     * Query the table for the number of rows in the table.
+     * @param table the name of the table to query
+     * @param selection A filter declaring which rows to return,
+     *              formatted as an SQL WHERE clause (excluding the WHERE itself).
+     *              Passing null will count all rows for the given table
+     * @param selectionArgs You may include ?s in selection,
+     *              which will be replaced by the values from selectionArgs,
+     *              in order that they appear in the selection.
+     *              The values will be bound as Strings.
+     * @return the number of rows in the table filtered by the selection
+     */
+    public long queryNumEntries(String table, String selection, String[] selectionArgs) {
+        String s = (!TextUtils.isEmpty(selection)) ? " where " + selection : "";
+        return longForQuery("select count(*) from " + table + s, selectionArgs);
+    }
+
+    /**
      * Utility method to run the query on the db and return the value in the
      * first column of the first row.
      */
-    private static long longForQuery(SQLiteDatabase db, String query, String[] selectionArgs) {
-        SQLiteStatement prog = db.compileStatement(query);
+    public long longForQuery(String query, String[] selectionArgs) {
+        SQLiteStatement prog = compileStatement(query);
         try {
             return longForQuery(prog, selectionArgs);
         } finally {
@@ -2199,5 +2237,54 @@ public final class SQLiteDatabase extends SQLiteClosable {
     private static long longForQuery(SQLiteStatement prog, String[] selectionArgs) {
         prog.bindAllArgsAsStrings(selectionArgs);
         return prog.simpleQueryForLong();
+    }
+
+    /**
+     * Utility method to run the query on the db and return the value in the
+     * first column of the first row.
+     */
+    public String stringForQuery(String query, String[] selectionArgs) {
+        SQLiteStatement prog = compileStatement(query);
+        try {
+            return stringForQuery(prog, selectionArgs);
+        } finally {
+            prog.close();
+        }
+    }
+
+    /**
+     * Utility method to run the pre-compiled query and return the value in the
+     * first column of the first row.
+     */
+    public static String stringForQuery(SQLiteStatement prog, String[] selectionArgs) {
+        prog.bindAllArgsAsStrings(selectionArgs);
+        return prog.simpleQueryForString();
+    }
+
+    /**
+     * Utility method to run the query on the db and return the blob value in the
+     * first column of the first row.
+     *
+     * @return A read-only file descriptor for a copy of the blob value.
+     */
+    public ParcelFileDescriptor blobFileDescriptorForQuery(String query, String[] selectionArgs) {
+        SQLiteStatement prog = compileStatement(query);
+        try {
+            return blobFileDescriptorForQuery(prog, selectionArgs);
+        } finally {
+            prog.close();
+        }
+    }
+
+    /**
+     * Utility method to run the pre-compiled query and return the blob value in the
+     * first column of the first row.
+     *
+     * @return A read-only file descriptor for a copy of the blob value.
+     */
+    public static ParcelFileDescriptor blobFileDescriptorForQuery(SQLiteStatement prog,
+                                                                  String[] selectionArgs) {
+        prog.bindAllArgsAsStrings(selectionArgs);
+        return prog.simpleQueryForBlobFileDescriptor();
     }
 }
