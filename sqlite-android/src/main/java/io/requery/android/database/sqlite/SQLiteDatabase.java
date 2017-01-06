@@ -206,70 +206,48 @@ public final class SQLiteDatabase extends SQLiteClosable {
     private static final String[] CONFLICT_VALUES = new String[]
             {"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
-    /**
-     * Maximum Length Of A LIKE Or GLOB Pattern
-     * The pattern matching algorithm used in the default LIKE and GLOB implementation
-     * of SQLite can exhibit O(N^2) performance (where N is the number of characters in
-     * the pattern) for certain pathological cases. To avoid denial-of-service attacks
-     * the length of the LIKE or GLOB pattern is limited to SQLITE_MAX_LIKE_PATTERN_LENGTH bytes.
-     * The default value of this limit is 50000. A modern workstation can evaluate
-     * even a pathological LIKE or GLOB pattern of 50000 bytes relatively quickly.
-     * The denial of service problem only comes into play when the pattern length gets
-     * into millions of bytes. Nevertheless, since most useful LIKE or GLOB patterns
-     * are at most a few dozen bytes in length, paranoid application developers may
-     * want to reduce this parameter to something in the range of a few hundred
-     * if they know that external users are able to generate arbitrary patterns.
-     */
-    public static final int SQLITE_MAX_LIKE_PATTERN_LENGTH = 50000;
+    /** Open flag to open in the database in read only mode */
+    public static final int OPEN_READONLY         = 0x00000001;
 
-    /**
-     * Open flag: Flag for {@link #openDatabase} to open the database for reading and writing.
-     * If the disk is full, this may fail even before you actually write anything.
-     *
-     * {@more} Note that the value of this flag is 0, so it is the default.
-     */
-    public static final int OPEN_READWRITE = 0x00000000;          // update native code if changing
+    /** Open flag to open in the database in read/write mode */
+    public static final int OPEN_READWRITE        = 0x00000002;
 
-    /**
-     * Open flag: Flag for {@link #openDatabase} to open the database for reading only.
-     * This is the only reliable way to open a database if the disk may be full.
-     */
-    public static final int OPEN_READONLY = 0x00000001;           // update native code if changing
+    /** Open flag to create the database if it does not exist */
+    public static final int OPEN_CREATE           = 0x00000004;
 
-    /**
-     * Open flag: Flag for {@link #openDatabase} to open the database without support for
-     * localized collators.
-     *
-     * {@more} This causes the collator <code>LOCALIZED</code> not to be created.
-     * You must be consistent when using this flag to use the setting the database was
-     * created with.  If this is set, {@link #setLocale} will do nothing.
-     */
-    public static final int NO_LOCALIZED_COLLATORS = 0x00000010;  // update native code if changing
+    /** Open flag to support URI filenames */
+    public static final int OPEN_URI              = 0x00000040;
 
-    /**
-     * Open flag: Flag for {@link #openDatabase} to create the database file if it does not
-     * already exist.
-     */
-    public static final int CREATE_IF_NECESSARY = 0x10000000;     // update native code if changing
+    /** Open flag opens the database in multi-thread threading mode */
+    public static final int OPEN_NOMUTEX          = 0x00008000;
 
-    /**
-     * Open flag: Flag for {@link #openDatabase} to open the database file with
-     * write-ahead logging enabled by default.  Using this flag is more efficient
-     * than calling {@link #enableWriteAheadLogging}.
-     *
-     * Write-ahead logging cannot be used with read-only databases so the value of
-     * this flag is ignored if the database is opened read-only.
-     *
-     * @see #enableWriteAheadLogging
-     */
+    /** Open flag opens the database in serialized threading mode */
+    public static final int OPEN_FULLMUTEX        = 0x00010000;
+
+    /** Open flag opens the database in shared cache mode */
+    public static final int OPEN_SHAREDCACHE      = 0x00020000;
+
+    /** Open flag opens the database in private cache mode */
+    public static final int OPEN_PRIVATECACHE     = 0x00040000;
+
+    /** Open flag equivalent to {@link #OPEN_READWRITE} | {@link #OPEN_CREATE} */
+    public static final int CREATE_IF_NECESSARY = OPEN_READWRITE | OPEN_CREATE;
+
+    /** Open flag to enable write-ahead logging */ // custom flag remove for sqlite3_open_v2
     public static final int ENABLE_WRITE_AHEAD_LOGGING = 0x20000000;
 
     /** Integer flag definition for the database open options */
+    @SuppressLint("UniqueConstants") // duplicate values provided for compatibility
     @IntDef(flag = true, value = {
         OPEN_READONLY,
         OPEN_READWRITE,
+        OPEN_CREATE,
+        OPEN_URI,
+        OPEN_NOMUTEX,
+        OPEN_FULLMUTEX,
+        OPEN_SHAREDCACHE,
+        OPEN_PRIVATECACHE,
         CREATE_IF_NECESSARY,
-        NO_LOCALIZED_COLLATORS,
         ENABLE_WRITE_AHEAD_LOGGING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface OpenFlags {
@@ -651,8 +629,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
     }
 
     /**
-     * Open the database according to the flags {@link #OPEN_READWRITE}
-     * {@link #OPEN_READONLY} {@link #CREATE_IF_NECESSARY} and/or {@link #NO_LOCALIZED_COLLATORS}.
+     * Open the database according to the flags {@link OpenFlags}
      *
      * <p>Sets the locale of the database to the  the system's current locale.
      * Call {@link #setLocale} if you would like something else.</p>
@@ -671,8 +648,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
     }
 
     /**
-     * Open the database according to the flags {@link #OPEN_READWRITE}
-     * {@link #OPEN_READONLY} {@link #CREATE_IF_NECESSARY} and/or {@link #NO_LOCALIZED_COLLATORS}.
+     * Open the database according to the flags {@link OpenFlags}
      *
      * <p>Sets the locale of the database to the  the system's current locale.
      * Call {@link #setLocale} if you would like something else.</p>
@@ -700,8 +676,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
     }
 
     /**
-     * Open the database according to the flags {@link #OPEN_READWRITE}
-     * {@link #OPEN_READONLY} {@link #CREATE_IF_NECESSARY} and/or {@link #NO_LOCALIZED_COLLATORS}.
+     * Open the database according to the given configuration.
      *
      * <p>Sets the locale of the database to the  the system's current locale.
      * Call {@link #setLocale} if you would like something else.</p>
@@ -1742,8 +1717,7 @@ public final class SQLiteDatabase extends SQLiteClosable {
     }
 
     /**
-     * Sets the locale for this database.  Does nothing if this database has
-     * the {@link #NO_LOCALIZED_COLLATORS} flag set or was opened read only.
+     * Sets the locale for this database.
      *
      * @param locale The new locale.
      *

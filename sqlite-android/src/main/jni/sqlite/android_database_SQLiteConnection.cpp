@@ -63,16 +63,6 @@ static struct {
 } gStringClassInfo;
 
 struct SQLiteConnection {
-    // Open flags.
-    // Must be kept in sync with the constants defined in SQLiteDatabase.java.
-    enum {
-        OPEN_READWRITE          = 0x00000000,
-        OPEN_READONLY           = 0x00000001,
-        OPEN_READ_MASK          = 0x00000001,
-        NO_LOCALIZED_COLLATORS  = 0x00000010,
-        CREATE_IF_NECESSARY     = 0x10000000,
-    };
-
     sqlite3* const db;
     const int openFlags;
     std::string path;
@@ -131,14 +121,6 @@ static int coll_localized(
 
 static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFlags,
         jstring labelStr, jboolean enableTrace, jboolean enableProfile) {
-    int sqliteFlags;
-    if (openFlags & SQLiteConnection::CREATE_IF_NECESSARY) {
-        sqliteFlags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
-    } else if (openFlags & SQLiteConnection::OPEN_READONLY) {
-        sqliteFlags = SQLITE_OPEN_READONLY;
-    } else {
-        sqliteFlags = SQLITE_OPEN_READWRITE;
-    }
 
     const char* pathChars = env->GetStringUTFChars(pathStr, NULL);
     std::string path(pathChars);
@@ -149,7 +131,7 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
     env->ReleaseStringUTFChars(labelStr, labelChars);
 
     sqlite3* db;
-    int err = sqlite3_open_v2(path.c_str(), &db, sqliteFlags, NULL);
+    int err = sqlite3_open_v2(path.c_str(), &db, openFlags, NULL);
     if (err != SQLITE_OK) {
         throw_sqlite3_exception_errcode(env, err, "Could not open database");
         return 0;
@@ -162,7 +144,7 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
     }
 
     // Check that the database is really read/write when that is what we asked for.
-    if ((sqliteFlags & SQLITE_OPEN_READWRITE) && sqlite3_db_readonly(db, NULL)) {
+    if ((openFlags & SQLITE_OPEN_READWRITE) && sqlite3_db_readonly(db, NULL)) {
         throw_sqlite3_exception(env, db, "Could not open the database in read/write mode.");
         sqlite3_close(db);
         return 0;

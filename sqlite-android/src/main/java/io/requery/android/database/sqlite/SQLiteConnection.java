@@ -220,7 +220,9 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     }
 
     private void open() {
-        mConnectionPtr = nativeOpen(mConfiguration.path, mConfiguration.openFlags,
+        mConnectionPtr = nativeOpen(mConfiguration.path,
+                // remove the wal flag as its a custom flag not supported by sqlite3_open_v2
+                mConfiguration.openFlags & ~SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING,
                 mConfiguration.label,
                 SQLiteDebug.DEBUG_SQL_STATEMENTS, SQLiteDebug.DEBUG_SQL_TIME);
 
@@ -378,10 +380,6 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     }
 
     private void setLocaleFromConfiguration() {
-        if ((mConfiguration.openFlags & SQLiteDatabase.NO_LOCALIZED_COLLATORS) != 0) {
-            return;
-        }
-
         // Register the localized collators.
         final String newLocale = mConfiguration.locale.toString();
         nativeRegisterLocalizedCollators(mConnectionPtr, newLocale);
