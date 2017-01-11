@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## 3.16.2
+
+- [SQLite 3.16.2](https://sqlite.org/releaselog/3_16_2.html)
+- Support additional SQLite open flags
+- Add methods from DatabaseUtils into base classes
+
 ## 3.16.0
 
 - [SQLite 3.16.0](https://sqlite.org/releaselog/3_16_0.html)
