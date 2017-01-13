@@ -47,7 +47,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.android.support:support-core-utils:25.1.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
 }
