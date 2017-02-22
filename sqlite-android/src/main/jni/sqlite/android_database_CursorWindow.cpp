@@ -173,9 +173,18 @@ static jstring nativeGetString(JNIEnv* env, jclass clazz, jlong windowPtr,
         if (sizeIncludingNull <= 1) {
             return NULL;
         }
-        jchar chars[sizeIncludingNull - 1];
-        jint size = utf8ToJavaCharArray(value, chars, sizeIncludingNull - 1);
-        return env->NewString(chars, size);
+        const size_t MaxStackStringSize = 65536; // max size for a stack char array
+        if (sizeIncludingNull > MaxStackStringSize) {
+            jchar* chars = new jchar[sizeIncludingNull - 1];
+            jint size = utf8ToJavaCharArray(value, chars, sizeIncludingNull - 1);
+            jstring string = env->NewString(chars, size);
+            delete[] chars;
+            return string;
+        } else {
+            jchar chars[sizeIncludingNull - 1];
+            jint size = utf8ToJavaCharArray(value, chars, sizeIncludingNull - 1);
+            return env->NewString(chars, size);
+        }
     } else if (type == CursorWindow::FIELD_TYPE_INTEGER) {
         int64_t value = window->getFieldSlotValueLong(fieldSlot);
         char buf[32];
