@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 3.18.0
+
+- [SQLite 3.18.0](https://sqlite.org/releaselog/3_18_0.html)
+- Fix conversion of strings larger than the available stack size (#35)
+
 ## 3.17.0
 
 - [SQLite 3.17.0](https://sqlite.org/releaselog/3_17_0.html)

@@ -1,4 +1,4 @@
-#Android SQLite support library
+# Android SQLite support library
 
 [![Build Status](https://travis-ci.org/requery/sqlite-android.svg?branch=master)](https://travis-ci.org/requery/sqlite-android)
 [ ![Download](https://api.bintray.com/packages/requery/requery/sqlite-android/images/download.svg) ](https://bintray.com/requery/requery/sqlite-android/_latestVersion)
@@ -45,7 +45,7 @@ Usage
 
 ```gradle
 dependencies {
-    compile 'io.requery:sqlite-android:3.17.0'
+    compile 'io.requery:sqlite-android:3.18.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
