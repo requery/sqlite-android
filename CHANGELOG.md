@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 3.19.3
+
+- [SQLite 3.19.3](https://sqlite.org/releaselog/3_19_3.html)
+- Add flags for enhanced FTS query syntax
+
 ## 3.19.2
 
 - [SQLite 3.19.2](https://sqlite.org/releaselog/3_19_2.html)
