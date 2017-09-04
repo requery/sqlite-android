@@ -17,6 +17,7 @@
 
 package io.requery.android.database.sqlite;
 
+import android.arch.persistence.db.SupportSQLiteProgram;
 import android.support.v4.os.CancellationSignal;
 
 import java.util.Arrays;
@@ -28,7 +29,7 @@ import java.util.Arrays;
  * </p>
  */
 @SuppressWarnings("unused")
-public abstract class SQLiteProgram extends SQLiteClosable {
+public abstract class SQLiteProgram extends SQLiteClosable implements SupportSQLiteProgram {
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private final SQLiteDatabase mDatabase;
@@ -118,6 +119,7 @@ public abstract class SQLiteProgram extends SQLiteClosable {
      *
      * @param index The 1-based index to the parameter to bind null to
      */
+    @Override
     public void bindNull(int index) {
         bind(index, null);
     }
@@ -129,6 +131,7 @@ public abstract class SQLiteProgram extends SQLiteClosable {
      * @param index The 1-based index to the parameter to bind
      * @param value The value to bind
      */
+    @Override
     public void bindLong(int index, long value) {
         bind(index, value);
     }
@@ -140,6 +143,7 @@ public abstract class SQLiteProgram extends SQLiteClosable {
      * @param index The 1-based index to the parameter to bind
      * @param value The value to bind
      */
+    @Override
     public void bindDouble(int index, double value) {
         bind(index, value);
     }
@@ -151,6 +155,7 @@ public abstract class SQLiteProgram extends SQLiteClosable {
      * @param index The 1-based index to the parameter to bind
      * @param value The value to bind, must not be null
      */
+    @Override
     public void bindString(int index, String value) {
         if (value == null) {
             throw new IllegalArgumentException("the bind value at index " + index + " is null");
@@ -165,6 +170,7 @@ public abstract class SQLiteProgram extends SQLiteClosable {
      * @param index The 1-based index to the parameter to bind
      * @param value The value to bind, must not be null
      */
+    @Override
     public void bindBlob(int index, byte[] value) {
         if (value == null) {
             throw new IllegalArgumentException("the bind value at index " + index + " is null");
@@ -204,6 +210,7 @@ public abstract class SQLiteProgram extends SQLiteClosable {
     /**
      * Clears all existing bindings. Unset bindings are treated as NULL.
      */
+    @Override
     public void clearBindings() {
         if (mBindArgs != null) {
             Arrays.fill(mBindArgs, null);
