@@ -18,14 +18,11 @@ gradle.projectsEvaluated {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 25
-        versionCode 1
-        versionName project.version
+        minSdkVersion 14
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'proguard-rules.pro'
     }
@@ -47,7 +44,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-core-utils:25.1.0'
+    compile 'android.arch.persistence:db:1.0.0-beta1'
+    compile 'com.android.support:support-core-utils:26.1.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
 }
