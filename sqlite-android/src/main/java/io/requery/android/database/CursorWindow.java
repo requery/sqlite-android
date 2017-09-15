@@ -123,8 +123,13 @@ public class CursorWindow extends SQLiteClosable {
      * </p>
      */
     public void clear() {
-        mStartPos = 0;
-        nativeClear(mWindowPtr);
+        acquireReference();
+        try{
+            mStartPos = 0;
+            nativeClear(mWindowPtr);
+        }finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -159,7 +164,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return The number of rows in this cursor window.
      */
     public int getNumRows() {
-        return nativeGetNumRows(mWindowPtr);
+        acquireReference();
+        try {
+            return nativeGetNumRows(mWindowPtr);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -174,7 +184,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return True if successful.
      */
     public boolean setNumColumns(int columnNum) {
-        return nativeSetNumColumns(mWindowPtr, columnNum);
+        acquireReference();
+        try {
+            return nativeSetNumColumns(mWindowPtr, columnNum);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -183,7 +198,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return True if successful, false if the cursor window is out of memory.
      */
     public boolean allocRow(){
-        return nativeAllocRow(mWindowPtr);
+        acquireReference();
+        try {
+            return nativeAllocRow(mWindowPtr);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -211,7 +231,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return The field type.
      */
     public int getType(int row, int column) {
-        return nativeGetType(mWindowPtr, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativeGetType(mWindowPtr, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -236,7 +261,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return The value of the field as a byte array.
      */
     public byte[] getBlob(int row, int column) {
-        return nativeGetBlob(mWindowPtr, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativeGetBlob(mWindowPtr, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -266,11 +296,16 @@ public class CursorWindow extends SQLiteClosable {
      * @return The value of the field as a string.
      */
     public String getString(int row, int column) {
-        String value = nativeGetString(mWindowPtr, row - mStartPos, column);
-        if (value == null) {
-            return "";
+        acquireReference();
+        try {
+            String value = nativeGetString(mWindowPtr, row - mStartPos, column);
+            if (value == null) {
+                return "";
+            }
+            return value;
+        } finally {
+            releaseReference();
         }
-        return value;
     }
 
     /**
@@ -307,10 +342,15 @@ public class CursorWindow extends SQLiteClosable {
         if (buffer == null) {
             throw new IllegalArgumentException("CharArrayBuffer should not be null");
         }
-        // TODO not as optimal as the original code
-        char[] chars = getString(row, column).toCharArray();
-        buffer.data = chars;
-        buffer.sizeCopied = chars.length;
+        acquireReference();
+        try {
+            // TODO not as optimal as the original code
+            char[] chars = getString(row, column).toCharArray();
+            buffer.data = chars;
+            buffer.sizeCopied = chars.length;
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -336,7 +376,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return The value of the field as a <code>long</code>.
      */
     public long getLong(int row, int column) {
-        return nativeGetLong(mWindowPtr, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativeGetLong(mWindowPtr, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -363,7 +408,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return The value of the field as a <code>double</code>.
      */
     public double getDouble(int row, int column) {
-        return nativeGetDouble(mWindowPtr, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativeGetDouble(mWindowPtr, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -423,7 +473,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return True if successful.
      */
     public boolean putBlob(byte[] value, int row, int column) {
-        return nativePutBlob(mWindowPtr, value, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativePutBlob(mWindowPtr, value, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -435,7 +490,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return True if successful.
      */
     public boolean putString(String value, int row, int column) {
-        return nativePutString(mWindowPtr, value, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativePutString(mWindowPtr, value, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -447,7 +507,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return True if successful.
      */
     public boolean putLong(long value, int row, int column) {
-        return nativePutLong(mWindowPtr, value, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativePutLong(mWindowPtr, value, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -460,7 +525,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return True if successful.
      */
     public boolean putDouble(double value, int row, int column) {
-        return nativePutDouble(mWindowPtr, value, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativePutDouble(mWindowPtr, value, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     /**
@@ -471,7 +541,12 @@ public class CursorWindow extends SQLiteClosable {
      * @return True if successful.
      */
     public boolean putNull(int row, int column) {
-        return nativePutNull(mWindowPtr, row - mStartPos, column);
+        acquireReference();
+        try {
+            return nativePutNull(mWindowPtr, row - mStartPos, column);
+        } finally {
+            releaseReference();
+        }
     }
 
     @Override
