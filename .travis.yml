@@ -9,7 +9,6 @@ android:
     - build-tools-25.0.2
     - android-21
     - android-25
-    - extra
     - sys-img-armeabi-v7a-android-21
 
 before_install:
