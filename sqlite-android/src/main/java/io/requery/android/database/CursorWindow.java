@@ -266,11 +266,7 @@ public class CursorWindow extends SQLiteClosable {
      * @return The value of the field as a string.
      */
     public String getString(int row, int column) {
-        String value = nativeGetString(mWindowPtr, row - mStartPos, column);
-        if (value == null) {
-            return "";
-        }
-        return value;
+        return nativeGetString(mWindowPtr, row - mStartPos, column);
     }
 
     /**

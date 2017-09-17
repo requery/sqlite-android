@@ -119,7 +119,7 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
         Cursor cursor = mDatabase.rawQuery("SELECT emptyFunction(3.14)", null);
         // always empty regardless of if sqlite3_result_null is called or not
         cursor.moveToFirst();
-        assertSame("", cursor.getString(0));
+        assertSame(null, cursor.getString(0));
     }
 
     @MediumTest
@@ -783,7 +783,7 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
             Assert.assertTrue(cur.moveToNext());
             Assert.assertEquals("j",
                     cur.getString(TABLE_INFO_PRAGMA_COLUMNNAME_INDEX));
-            Assert.assertEquals("", cur.getString(TABLE_INFO_PRAGMA_DEFAULT_INDEX));
+            Assert.assertEquals(null, cur.getString(TABLE_INFO_PRAGMA_DEFAULT_INDEX));
 
             Assert.assertTrue(cur.moveToNext());
             Assert.assertEquals("s",
@@ -794,7 +794,7 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
             Assert.assertTrue(cur.moveToNext());
             Assert.assertEquals("t",
                     cur.getString(TABLE_INFO_PRAGMA_COLUMNNAME_INDEX));
-            Assert.assertEquals("", cur.getString(TABLE_INFO_PRAGMA_DEFAULT_INDEX));
+            Assert.assertEquals(null, cur.getString(TABLE_INFO_PRAGMA_DEFAULT_INDEX));
 
             Assert.assertTrue(cur.moveToNext());
             Assert.assertEquals("select",
@@ -804,6 +804,7 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
 
             cur.close();
         } catch (Throwable t) {
+            t.printStackTrace();
             throw new RuntimeException(
                     "If you see this test fail, it's likely that something about " +
                     "sqlite's PRAGMA table_info(...) command has changed.", t);

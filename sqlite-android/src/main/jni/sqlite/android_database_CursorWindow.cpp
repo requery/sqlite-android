@@ -36,6 +36,8 @@ static struct {
     jfieldID sizeCopied;
 } gCharArrayBufferClassInfo;
 
+static jstring gEmptyString = NULL;
+
 static void throwExceptionWithRowCol(JNIEnv* env, jint row, jint column) {
     jniThrowException(env, "java/lang/IllegalStateException", "Couldn't read row");
 }
@@ -171,7 +173,7 @@ static jstring nativeGetString(JNIEnv* env, jclass clazz, jlong windowPtr,
         size_t sizeIncludingNull;
         const char* value = window->getFieldSlotValueString(fieldSlot, &sizeIncludingNull);
         if (sizeIncludingNull <= 1) {
-            return NULL;
+            return gEmptyString;
         }
         const size_t MaxStackStringSize = 65536; // max size for a stack char array
         if (sizeIncludingNull > MaxStackStringSize) {
@@ -399,6 +401,7 @@ int register_android_database_CursorWindow(JNIEnv* env)
     GET_FIELD_ID(gCharArrayBufferClassInfo.data, clazz, "data", "[C");
     GET_FIELD_ID(gCharArrayBufferClassInfo.sizeCopied, clazz, "sizeCopied", "I");
 
+    gEmptyString = static_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("")));
     return jniRegisterNativeMethods(env,
     "io/requery/android/database/CursorWindow", sMethods, NELEM(sMethods));
 }
