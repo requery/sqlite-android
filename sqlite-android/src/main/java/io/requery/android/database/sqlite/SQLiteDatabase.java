@@ -1255,21 +1255,54 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
                 having, orderBy, limit);
     }
 
+    /**
+     * Runs the provided SQL and returns a {@link Cursor} over the result set.
+     *
+     * @param query the SQL query. The SQL string must not be ; terminated
+     * @return A {@link Cursor} object, which is positioned before the first entry. Note that
+     * {@link Cursor}s are not synchronized, see the documentation for more details.
+     */
     @Override
     public Cursor query(String query) {
         return rawQueryWithFactory(null, query, null, null, null);
     }
 
+    /**
+     * Runs the provided SQL and returns a {@link Cursor} over the result set.
+     *
+     * @param query the SQL query. The SQL string must not be ; terminated
+     * @param selectionArgs You may include ?s in where clause in the query,
+     *     which will be replaced by the values from selectionArgs.
+     * @return A {@link Cursor} object, which is positioned before the first entry. Note that
+     * {@link Cursor}s are not synchronized, see the documentation for more details.
+     */
     @Override
     public Cursor query(String query, Object[] selectionArgs) {
         return rawQueryWithFactory(null, query, selectionArgs, null, null);
     }
 
+    /**
+     * Runs the provided SQL and returns a {@link Cursor} over the result set.
+     *
+     * @param supportQuery the SQL query.
+     * @return A {@link Cursor} object, which is positioned before the first entry. Note that
+     * {@link Cursor}s are not synchronized, see the documentation for more details.
+     */
     @Override
     public Cursor query(final SupportSQLiteQuery supportQuery) {
         return query(supportQuery, (CancellationSignal) null);
     }
 
+    /**
+     * Runs the provided SQL and returns a {@link Cursor} over the result set.
+     *
+     * @param supportQuery the SQL query. The SQL string must not be ; terminated
+     * @param signal A signal to cancel the operation in progress, or null if none.
+     * If the operation is canceled, then {@link OperationCanceledException} will be thrown
+     * when the query is executed.
+     * @return A {@link Cursor} object, which is positioned before the first entry. Note that
+     * {@link Cursor}s are not synchronized, see the documentation for more details.
+     */
     @Override
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public Cursor query(SupportSQLiteQuery supportQuery, android.os.CancellationSignal signal) {
@@ -1283,6 +1316,16 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         return query(supportQuery, supportCancellationSignal);
     }
 
+    /**
+     * Runs the provided SQL and returns a {@link Cursor} over the result set.
+     *
+     * @param supportQuery the SQL query. The SQL string must not be ; terminated
+     * @param signal A signal to cancel the operation in progress, or null if none.
+     * If the operation is canceled, then {@link OperationCanceledException} will be thrown
+     * when the query is executed.
+     * @return A {@link Cursor} object, which is positioned before the first entry. Note that
+     * {@link Cursor}s are not synchronized, see the documentation for more details.
+     */
     public Cursor query(final SupportSQLiteQuery supportQuery, CancellationSignal signal) {
         return rawQueryWithFactory(new CursorFactory() {
             @Override
@@ -1463,6 +1506,19 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
                 CONFLICT_REPLACE);
     }
 
+    /**
+     * General method for inserting a row into the database.
+     *
+     * @param table the table to insert the row into
+     * @param conflictAlgorithm for insert conflict resolver
+     * @param values this map contains the initial column values for the
+     *            row. The keys should be the column names and the values the
+     *            column values
+     * @return the row ID of the newly inserted row
+     * OR the primary key of the existing row if the input param 'conflictAlgorithm' =
+     * {@link #CONFLICT_IGNORE}
+     * OR -1 if any error
+     */
     @Override
     public long insert(String table, @ConflictAlgorithm int conflictAlgorithm,
            ContentValues values) throws SQLException {
@@ -1561,6 +1617,19 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         }
     }
 
+    /**
+     * Convenience method for deleting rows in the database.
+     *
+     * @param table the table to delete from
+     * @param whereClause the optional WHERE clause to apply when deleting.
+     *            Passing null will delete all rows.
+     * @param whereArgs You may include ?s in the where clause, which
+     *            will be replaced by the values from whereArgs. The values
+     *            will be bound as Strings.
+     * @return the number of rows affected if a whereClause is passed in, 0
+     *         otherwise. To remove all rows and get a count pass "1" as the
+     *         whereClause.
+     */
     @Override
     public int delete(String table, String whereClause, Object[] whereArgs) {
         acquireReference();
@@ -1608,8 +1677,9 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
      * @param conflictAlgorithm for update conflict resolver
      * @return the number of rows affected
      */
-    public int updateWithOnConflict(String table, ContentValues values,
-            String whereClause, String[] whereArgs, @ConflictAlgorithm int conflictAlgorithm) {
+    @Override
+    public int update(String table, @ConflictAlgorithm int conflictAlgorithm, ContentValues values,
+                      String whereClause,  Object[] whereArgs) {
         if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("Empty values");
         }
@@ -1654,9 +1724,22 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         }
     }
 
-    @Override
-    public int update(String table, @ConflictAlgorithm int conflictAlgorithm, ContentValues values,
-            String whereClause,  Object[] whereArgs) {
+    /**
+     * Convenience method for updating rows in the database.
+     *
+     * @param table the table to update in
+     * @param values a map from column names to new column values. null is a
+     *            valid value that will be translated to NULL.
+     * @param whereClause the optional WHERE clause to apply when updating.
+     *            Passing null will update all rows.
+     * @param whereArgs You may include ?s in the where clause, which
+     *            will be replaced by the values from whereArgs. The values
+     *            will be bound as Strings.
+     * @param conflictAlgorithm for update conflict resolver
+     * @return the number of rows affected
+     */
+    public int updateWithOnConflict(String table, ContentValues values,
+            String whereClause, String[] whereArgs, @ConflictAlgorithm int conflictAlgorithm) {
         if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("Empty values");
         }
