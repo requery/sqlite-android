@@ -144,6 +144,32 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
         assertEquals("this is an updated test", value);
     }
 
+    @MediumTest
+    public void testSupportUpdate() throws Exception {
+        populateDefaultTable();
+
+        ContentValues values = new ContentValues(1);
+        values.put("data", "this is an updated test");
+        assertEquals(1, mDatabase.update("test", SQLiteDatabase.CONFLICT_NONE, values,
+                "_id=?", new Object[] { 1 }));
+        Cursor c = mDatabase.query("test", null, "_id=1", null, null, null, null);
+        assertNotNull(c);
+        assertEquals(1, c.getCount());
+        c.moveToFirst();
+        String value = c.getString(c.getColumnIndexOrThrow("data"));
+        assertEquals("this is an updated test", value);
+    }
+
+    @MediumTest
+    public void testSupportDelete() throws Exception {
+        populateDefaultTable();
+
+        assertEquals(1, mDatabase.delete("test", "_id=?", new Object[] { 1 }));
+        Cursor c = mDatabase.query("test", null, "_id=1", null, null, null, null);
+        assertNotNull(c);
+        assertEquals(0, c.getCount());
+    }
+
     @Suppress // PHONE_NUMBERS_EQUAL not supported
     @MediumTest
     public void testPhoneNumbersEqual() throws Exception {
