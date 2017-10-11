@@ -17,6 +17,7 @@
 
 package io.requery.android.database.sqlite;
 
+import android.arch.persistence.db.SupportSQLiteStatement;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteDoneException;
@@ -31,7 +32,7 @@ import android.os.ParcelFileDescriptor;
  * </p>
  */
 @SuppressWarnings("unused")
-public final class SQLiteStatement extends SQLiteProgram {
+public final class SQLiteStatement extends SQLiteProgram implements SupportSQLiteStatement {
 
     SQLiteStatement(SQLiteDatabase db, String sql, Object[] bindArgs) {
         super(db, sql, bindArgs, null);
@@ -43,6 +44,7 @@ public final class SQLiteStatement extends SQLiteProgram {
      *
      * @throws SQLException If the SQL string is invalid for some reason
      */
+    @Override
     public void execute() {
         acquireReference();
         try {
@@ -62,6 +64,7 @@ public final class SQLiteStatement extends SQLiteProgram {
      * @return the number of rows affected by this SQL statement execution.
      * @throws SQLException If the SQL string is invalid for some reason
      */
+    @Override
     public int executeUpdateDelete() {
         acquireReference();
         try {
@@ -83,6 +86,7 @@ public final class SQLiteStatement extends SQLiteProgram {
      *
      * @throws SQLException If the SQL string is invalid for some reason
      */
+    @Override
     public long executeInsert() {
         acquireReference();
         try {
@@ -104,6 +108,7 @@ public final class SQLiteStatement extends SQLiteProgram {
      *
      * @throws SQLiteDoneException if the query returns zero rows
      */
+    @Override
     public long simpleQueryForLong() {
         acquireReference();
         try {
@@ -125,6 +130,7 @@ public final class SQLiteStatement extends SQLiteProgram {
      *
      * @throws SQLiteDoneException if the query returns zero rows
      */
+    @Override
     public String simpleQueryForString() {
         acquireReference();
         try {

@@ -59,6 +59,16 @@ If you expose `Cursor` instances across processes you should wrap the returned c
 [CrossProcessCursorWrapper](http://developer.android.com/reference/android/database/CrossProcessCursorWrapper.html)
 for performance reasons the cursors are not cross process by default.
 
+### Support library compatibility
+
+The library implements the SupportSQLite interfaces provided by the support library. Use
+`RequerySQLiteOpenHelperFactory` to obtain an implementation of `(Support)SQLiteOpenHelper` based
+on a `SupportSQLiteOpenHelper.Configuration` and `SupportSQLiteOpenHelper.Callback`.
+
+This also allows you to use sqlite-android with libraries like Room by passing an instance
+of `RequerySQLiteOpenHelperFactory` to them.
+
+
 CPU Architectures
 -----------------
 
