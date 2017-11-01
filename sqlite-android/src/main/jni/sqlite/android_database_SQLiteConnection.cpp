@@ -243,6 +243,7 @@ static void sqliteCustomFunctionCallback(sqlite3_context *context,
                 sqlite3_result_text(context, chars, -1, SQLITE_TRANSIENT);
                 env->ReleaseStringUTFChars(str, chars);
             }
+            env->DeleteLocalRef(result);
         }
 error:
         env->DeleteLocalRef(argsArray);
