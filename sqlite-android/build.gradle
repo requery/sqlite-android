@@ -45,7 +45,7 @@ android {
 }
 
 dependencies {
-    compile 'android.arch.persistence:db:1.0.0-beta2'
+    compile 'android.arch.persistence:db:1.0.0-rc1'
     compile 'com.android.support:support-core-utils:26.1.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
