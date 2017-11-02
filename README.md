@@ -78,6 +78,7 @@ The native library is built for the following CPU architectures:
 - `arm64-v8a`
 - `x86`
 - `x86_64`
+- `mips`
 
 However you may not want to include all binaries in your apk. You can exclude certain variants by
 using `packagingOptions`:
@@ -88,11 +89,12 @@ android {
         exclude 'lib/arm64-v8a/libsqlite3x.so'
         exclude 'lib/x86/libsqlite3x.so'
         exclude 'lib/x86_64/libsqlite3x.so'
+        exclude 'lib/mips/libsqlite3x.so'
     }
 }
 ```
 
-The size of the artifacts with only the armeabi-v7a binary is **~500kb**. In general you can use
+The size of the artifacts with only the armeabi-v7a binary is **~600kb**. In general you can use
 armeabi-v7a on the majority of Android devices including Intel Atom which provides a native
 translation layer, however performance under the translation layer is worse than using the x86
 binary.
@@ -143,7 +145,7 @@ Changes
 License
 -------
 
-    Copyright (C) 2016 requery.io
+    Copyright (C) 2017 requery.io
     Copyright (C) 2005-2012 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");

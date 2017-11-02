@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+## 3.21.0
+
+- [SQLite 3.21.0](https://sqlite.org/releaselog/3_21_0.html)
+- Support SupportSQLiteDatabase interfaces provided in `android.arch.persistence:db`
+- Support MIPS abi
+- Fix local reference overflow when using custom functions
+
 ## 3.20.1
 
 - [SQLite 3.20.1](https://sqlite.org/releaselog/3_20_1.html)

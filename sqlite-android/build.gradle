@@ -10,7 +10,7 @@ apply plugin: 'com.jfrog.bintray'
 import de.undercouch.gradle.tasks.download.Download
 
 group = 'io.requery'
-version = '3.20.1'
+version = '3.21.0'
 description = 'Android SQLite compatibility library'
 
 gradle.projectsEvaluated {
@@ -55,7 +55,7 @@ publish.dependsOn "assembleRelease"
 bintrayUpload.dependsOn "assembleRelease"
 
 ext {
-    sqliteDistributionUrl = 'http://sqlite.org/2017/sqlite-amalgamation-3200100.zip'
+    sqliteDistributionUrl = 'http://sqlite.org/2017/sqlite-amalgamation-3210000.zip'
     pomXml = {
         resolveStrategy = Closure.DELEGATE_FIRST
         name project.name
