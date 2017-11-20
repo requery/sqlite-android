@@ -839,7 +839,7 @@ static void nativeLoadExtension(JNIEnv* env, jobject clazz,
         char* formattedError = sqlite3_mprintf("Could not register extension: %s", errorMessage);
         sqlite3_free(errorMessage);
 
-        throw_sqlite3_exception_errcode(env, result, "Could not register extension");
+        throw_sqlite3_exception_errcode(env, result, formattedError);
         sqlite3_free(formattedError);
     }
 }
