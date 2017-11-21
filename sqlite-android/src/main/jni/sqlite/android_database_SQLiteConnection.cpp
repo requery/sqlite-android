@@ -819,6 +819,8 @@ static jboolean nativeHasCodec(JNIEnv* env, jobject clazz){
 
 static void nativeLoadExtension(JNIEnv* env, jobject clazz,
                                 jlong connectionPtr, jstring file, jstring proc) {
+    char* errorMessage;
+
     SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
     int result = sqlite3_enable_load_extension(connection->db, 1);
     if (result == SQLITE_OK) {
@@ -827,14 +829,18 @@ static void nativeLoadExtension(JNIEnv* env, jobject clazz,
         if (proc) {
             procChars = env->GetStringUTFChars(proc, NULL);
         }
-        result = sqlite3_load_extension(connection->db, fileChars, procChars, 0);
+        result = sqlite3_load_extension(connection->db, fileChars, procChars, &errorMessage);
         env->ReleaseStringUTFChars(file, fileChars);
         if (proc) {
             env->ReleaseStringUTFChars(proc, procChars);
         }
     }
     if (result != SQLITE_OK) {
-        throw_sqlite3_exception_errcode(env, result, "Could not register extension");
+        char* formattedError = sqlite3_mprintf("Could not register extension: %s", errorMessage);
+        sqlite3_free(errorMessage);
+
+        throw_sqlite3_exception_errcode(env, result, formattedError);
+        sqlite3_free(formattedError);
     }
 }
 
