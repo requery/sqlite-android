@@ -28,10 +28,13 @@ import io.requery.android.database.sqlite.SQLiteClosable;
 @SuppressWarnings("unused")
 public class CursorWindow extends SQLiteClosable {
 
-    private static final int WINDOW_SIZE_KB = 1024;
+    private static final int WINDOW_SIZE_KB = 2048;
 
-    // This static member will be evaluated when first used.
-    private static int sCursorWindowSize = -1;
+    /** The cursor window size. resource xml file specifies the value in kB.
+     * convert it to bytes here by multiplying with 1024.
+     */
+    private static final int sCursorWindowSize =
+        WINDOW_SIZE_KB * 1024;
 
     /**
      * The native CursorWindow object pointer.  (FOR INTERNAL USE ONLY)
@@ -77,12 +80,6 @@ public class CursorWindow extends SQLiteClosable {
     public CursorWindow(String name) {
         mStartPos = 0;
         mName = name != null && name.length() != 0 ? name : "<unnamed>";
-        if (sCursorWindowSize < 0) {
-            /** The cursor window size. resource xml file specifies the value in kB.
-             * convert it to bytes here by multiplying with 1024.
-             */
-            sCursorWindowSize = WINDOW_SIZE_KB * 1024;
-        }
         mWindowPtr = nativeCreate(mName, sCursorWindowSize);
         if (mWindowPtr == 0) {
             throw new CursorWindowAllocationException("Cursor window allocation of " +
