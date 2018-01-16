@@ -5,6 +5,8 @@ import android.arch.persistence.db.SupportSQLiteOpenHelper.Callback;
 import android.arch.persistence.db.SupportSQLiteOpenHelper.Configuration;
 import android.content.Context;
 
+import java.util.Collections;
+
 import io.requery.android.database.DatabaseErrorHandler;
 
 /**
@@ -13,19 +15,31 @@ import io.requery.android.database.DatabaseErrorHandler;
  */
 @SuppressWarnings("unused")
 public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHelper.Factory {
+    private final Iterable<RequeryConfigurationOption> configurationOptions;
+
+    @SuppressWarnings("WeakerAccess")
+    public RequerySQLiteOpenHelperFactory(Iterable<RequeryConfigurationOption> configurationOptions) {
+        this.configurationOptions = configurationOptions;
+    }
+
+    public RequerySQLiteOpenHelperFactory() {
+        this(Collections.<RequeryConfigurationOption>emptyList());
+    }
 
     @Override
     public SupportSQLiteOpenHelper create(Configuration config) {
-        return new CallbackSQLiteOpenHelper(config.context, config.name, config.callback);
+        return new CallbackSQLiteOpenHelper(config.context, config.name, config.callback, configurationOptions);
     }
 
     private static final class CallbackSQLiteOpenHelper extends SQLiteOpenHelper {
 
         private final Callback callback;
+        private final Iterable<RequeryConfigurationOption> configurationOptions;
 
-        CallbackSQLiteOpenHelper(Context context, String name, Callback cb) {
+        CallbackSQLiteOpenHelper(Context context, String name, Callback cb, Iterable<RequeryConfigurationOption> ops) {
             super(context, name, null, cb.version, new CallbackDatabaseErrorHandler(cb));
             this.callback = cb;
+            this.configurationOptions = ops;
         }
 
         @Override
@@ -52,6 +66,16 @@ public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHe
         public void onOpen(SQLiteDatabase db) {
             callback.onOpen(db);
         }
+
+        @Override protected SQLiteDatabaseConfiguration createConfiguration(String path, int openFlags) {
+            SQLiteDatabaseConfiguration config = super.createConfiguration(path, openFlags);
+
+            for (RequeryConfigurationOption option : configurationOptions) {
+                config = option.apply(config);
+            }
+
+            return config;
+        }
     }
 
     private static final class CallbackDatabaseErrorHandler implements DatabaseErrorHandler {
@@ -66,5 +90,9 @@ public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHe
         public void onCorruption(SQLiteDatabase db) {
             callback.onCorruption(db);
         }
+    }
+
+    public interface RequeryConfigurationOption {
+        SQLiteDatabaseConfiguration apply(SQLiteDatabaseConfiguration configuration);
     }
 }
