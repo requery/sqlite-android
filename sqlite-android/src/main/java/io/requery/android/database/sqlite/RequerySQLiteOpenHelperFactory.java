@@ -15,15 +15,15 @@ import io.requery.android.database.DatabaseErrorHandler;
  */
 @SuppressWarnings("unused")
 public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHelper.Factory {
-    private final Iterable<RequeryConfigurationOption> configurationOptions;
+    private final Iterable<ConfigurationOptions> configurationOptions;
 
     @SuppressWarnings("WeakerAccess")
-    public RequerySQLiteOpenHelperFactory(Iterable<RequeryConfigurationOption> configurationOptions) {
+    public RequerySQLiteOpenHelperFactory(Iterable<ConfigurationOptions> configurationOptions) {
         this.configurationOptions = configurationOptions;
     }
 
     public RequerySQLiteOpenHelperFactory() {
-        this(Collections.<RequeryConfigurationOption>emptyList());
+        this(Collections.<ConfigurationOptions>emptyList());
     }
 
     @Override
@@ -34,9 +34,9 @@ public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHe
     private static final class CallbackSQLiteOpenHelper extends SQLiteOpenHelper {
 
         private final Callback callback;
-        private final Iterable<RequeryConfigurationOption> configurationOptions;
+        private final Iterable<ConfigurationOptions> configurationOptions;
 
-        CallbackSQLiteOpenHelper(Context context, String name, Callback cb, Iterable<RequeryConfigurationOption> ops) {
+        CallbackSQLiteOpenHelper(Context context, String name, Callback cb, Iterable<ConfigurationOptions> ops) {
             super(context, name, null, cb.version, new CallbackDatabaseErrorHandler(cb));
             this.callback = cb;
             this.configurationOptions = ops;
@@ -70,7 +70,7 @@ public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHe
         @Override protected SQLiteDatabaseConfiguration createConfiguration(String path, int openFlags) {
             SQLiteDatabaseConfiguration config = super.createConfiguration(path, openFlags);
 
-            for (RequeryConfigurationOption option : configurationOptions) {
+            for (ConfigurationOptions option : configurationOptions) {
                 config = option.apply(config);
             }
 
@@ -92,7 +92,7 @@ public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHe
         }
     }
 
-    public interface RequeryConfigurationOption {
+    public interface ConfigurationOptions {
         SQLiteDatabaseConfiguration apply(SQLiteDatabaseConfiguration configuration);
     }
 }
