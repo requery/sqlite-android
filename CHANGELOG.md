@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+## 3.22.0
+
+- [SQLite 3.22.0](https://sqlite.org/releaselog/3_22_0.html)
+- Update `android.arch.persistence:db` dependency to `1.0.0`
+- Improved error messaging on loading custom extensions
+- Increase CursorWindow size to match AOSP
+- Add custom extension and function loading to new SupportSQLiteDatabase API
+
 ## 3.21.0
 
 - [SQLite 3.21.0](https://sqlite.org/releaselog/3_21_0.html)
