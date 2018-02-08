@@ -91,6 +91,11 @@ public final class SQLiteDatabaseConfiguration {
     public final List<SQLiteCustomFunction> customFunctions = new ArrayList<>();
 
     /**
+     * The CustomFunction2s to register.
+     */
+    public final List<SQLiteCustomFunction2> customFunction2s = new ArrayList<>();
+
+    /**
      * The custom extensions to register.
      */
     public final List<SQLiteCustomExtension> customExtensions = new ArrayList<>();
@@ -128,9 +133,11 @@ public final class SQLiteDatabaseConfiguration {
     public SQLiteDatabaseConfiguration(String path,
                                        @SQLiteDatabase.OpenFlags int openFlags,
                                        List<SQLiteCustomFunction> functions,
+                                       List<SQLiteCustomFunction2> function2s,
                                        List<SQLiteCustomExtension> extensions) {
         this(path, openFlags);
         this.customFunctions.addAll(functions);
+        this.customFunction2s.addAll(function2s);
         this.customExtensions.addAll(extensions);
     }
 
@@ -170,6 +177,8 @@ public final class SQLiteDatabaseConfiguration {
         foreignKeyConstraintsEnabled = other.foreignKeyConstraintsEnabled;
         customFunctions.clear();
         customFunctions.addAll(other.customFunctions);
+        customFunction2s.clear();
+        customFunction2s.addAll(other.customFunction2s);
         customExtensions.clear();
         customExtensions.addAll(other.customExtensions);
     }

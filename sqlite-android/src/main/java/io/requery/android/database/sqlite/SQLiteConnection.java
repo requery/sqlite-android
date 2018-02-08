@@ -35,13 +35,14 @@ import android.support.v4.os.OperationCanceledException;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.util.Printer;
-import io.requery.android.database.CursorWindow;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import io.requery.android.database.CursorWindow;
 
 /**
  * Represents a SQLite database connection.
@@ -130,6 +131,8 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     private static native void nativeClose(long connectionPtr);
     private static native void nativeRegisterCustomFunction(long connectionPtr,
             SQLiteCustomFunction function);
+    private static native void nativeRegisterCustomFunction2(long connectionPtr,
+        SQLiteCustomFunction2 function);
     private static native void nativeRegisterLocalizedCollators(long connectionPtr, String locale);
     private static native long nativePrepareStatement(long connectionPtr, String sql);
     private static native void nativeFinalizeStatement(long connectionPtr, long statementPtr);
@@ -240,6 +243,13 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
         for (int i = 0; i < functionCount; i++) {
             SQLiteCustomFunction function = mConfiguration.customFunctions.get(i);
             nativeRegisterCustomFunction(mConnectionPtr, function);
+        }
+
+        // Register CustomFunction2s.
+        final int function2Count = mConfiguration.customFunction2s.size();
+        for (int i = 0; i < function2Count; i++) {
+            SQLiteCustomFunction2 function = mConfiguration.customFunction2s.get(i);
+            nativeRegisterCustomFunction2(mConnectionPtr, function);
         }
 
         // Register custom extensions
@@ -435,6 +445,15 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
             SQLiteCustomFunction function = configuration.customFunctions.get(i);
             if (!mConfiguration.customFunctions.contains(function)) {
                 nativeRegisterCustomFunction(mConnectionPtr, function);
+            }
+        }
+
+        // Register CustomFunction2s.
+        final int function2Count = configuration.customFunction2s.size();
+        for (int i = 0; i < function2Count; i++) {
+            SQLiteCustomFunction2 function = configuration.customFunction2s.get(i);
+            if (!mConfiguration.customFunction2s.contains(function)) {
+                nativeRegisterCustomFunction2(mConnectionPtr, function);
             }
         }
 

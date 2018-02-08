@@ -43,6 +43,7 @@ LOCAL_SRC_FILES:= \
 	android_database_SQLiteGlobal.cpp \
 	android_database_SQLiteDebug.cpp \
 	android_database_CursorWindow.cpp \
+	android_database_SQLiteCustomFunction2.cpp \
 	CursorWindow.cpp \
 	JNIHelp.cpp \
 	JNIString.cpp
