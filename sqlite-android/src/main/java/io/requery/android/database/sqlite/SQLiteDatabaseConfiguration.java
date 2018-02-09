@@ -87,13 +87,16 @@ public final class SQLiteDatabaseConfiguration {
 
     /**
      * The custom functions to register.
+     *
+     * This interface is deprecated; see {@link SQLiteFunction}
      */
+    @Deprecated
     public final List<SQLiteCustomFunction> customFunctions = new ArrayList<>();
 
     /**
-     * The CustomFunction2s to register.
+     * The {@link SQLiteFunction}s to register.
      */
-    public final List<SQLiteCustomFunction2> customFunction2s = new ArrayList<>();
+    public final List<SQLiteFunction> functions = new ArrayList<>();
 
     /**
      * The custom extensions to register.
@@ -132,13 +135,13 @@ public final class SQLiteDatabaseConfiguration {
      */
     public SQLiteDatabaseConfiguration(String path,
                                        @SQLiteDatabase.OpenFlags int openFlags,
-                                       List<SQLiteCustomFunction> functions,
-                                       List<SQLiteCustomFunction2> function2s,
+                                       List<SQLiteCustomFunction> customFunctions,
+                                       List<SQLiteFunction> functions,
                                        List<SQLiteCustomExtension> extensions) {
         this(path, openFlags);
-        this.customFunctions.addAll(functions);
-        this.customFunction2s.addAll(function2s);
+        this.customFunctions.addAll(customFunctions);
         this.customExtensions.addAll(extensions);
+        this.functions.addAll(functions);
     }
 
     /**
@@ -177,10 +180,10 @@ public final class SQLiteDatabaseConfiguration {
         foreignKeyConstraintsEnabled = other.foreignKeyConstraintsEnabled;
         customFunctions.clear();
         customFunctions.addAll(other.customFunctions);
-        customFunction2s.clear();
-        customFunction2s.addAll(other.customFunction2s);
         customExtensions.clear();
         customExtensions.addAll(other.customExtensions);
+        functions.clear();
+        functions.addAll(other.functions);
     }
 
     /**

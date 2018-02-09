@@ -1,4 +1,4 @@
-#define LOG_TAG "SQLiteFunction2"
+#define LOG_TAG "SQLiteFunction"
 
 #include <jni.h>
 #include <sys/mman.h>
@@ -222,10 +222,10 @@ static const JNINativeMethod sMethods[] =
             (void*)nativeSetResultNull },
 };
 
-int register_android_database_SQLiteCustomFunction2(JNIEnv* env)
+int register_android_database_SQLiteFunction(JNIEnv* env)
 {
     return jniRegisterNativeMethods(env,
-    "io/requery/android/database/sqlite/SQLiteCustomFunction2", sMethods, NELEM(sMethods));
+        "io/requery/android/database/sqlite/SQLiteFunction", sMethods, NELEM(sMethods));
 }
 
 } // namespace android

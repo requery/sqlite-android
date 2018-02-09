@@ -62,7 +62,7 @@ static struct {
     jfieldID name;
     jfieldID numArgs;
     jmethodID dispatchCallback;
-} gSQLiteCustomFunction2ClassInfo;
+} gSQLiteFunctionClassInfo;
 
 static struct {
     jclass clazz;
@@ -264,9 +264,9 @@ error:
     }
 }
 
-// Called each time a CustomFunction2 is evaluated.
-static void sqliteCustomFunctionCallback2(sqlite3_context *context,
-        int argc, sqlite3_value **argv) {
+// Called each time a Function is evaluated.
+static void sqliteFunctionCallback(sqlite3_context *context,
+                                   int argc, sqlite3_value **argv) {
 
     JNIEnv* env = 0;
     gpJavaVM->GetEnv((void**)&env, JNI_VERSION_1_4);
@@ -282,7 +282,7 @@ static void sqliteCustomFunctionCallback2(sqlite3_context *context,
     jint argsCount = jint(argc);
 
     env->CallVoidMethod(functionObj,
-            gSQLiteCustomFunction2ClassInfo.dispatchCallback,
+            gSQLiteFunctionClassInfo.dispatchCallback,
             contextPtr,
             argsPtr,
             argsCount
@@ -332,20 +332,20 @@ static void nativeRegisterCustomFunction(JNIEnv* env, jclass clazz, jlong connec
     }
 }
 
-static void nativeRegisterCustomFunction2(JNIEnv* env, jclass clazz, jlong connectionPtr,
-                                          jobject functionObj) {
+static void nativeRegisterFunction(JNIEnv *env, jclass clazz, jlong connectionPtr,
+                                   jobject functionObj) {
     SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
 
     jstring nameStr = jstring(env->GetObjectField(
-            functionObj, gSQLiteCustomFunction2ClassInfo.name));
-    jint numArgs = env->GetIntField(functionObj, gSQLiteCustomFunction2ClassInfo.numArgs);
+            functionObj, gSQLiteFunctionClassInfo.name));
+    jint numArgs = env->GetIntField(functionObj, gSQLiteFunctionClassInfo.numArgs);
 
     jobject functionObjGlobal = env->NewGlobalRef(functionObj);
 
     const char* name = env->GetStringUTFChars(nameStr, NULL);
     int err = sqlite3_create_function_v2(connection->db, name, numArgs, SQLITE_UTF16,
                                          reinterpret_cast<void*>(functionObjGlobal),
-                                         &sqliteCustomFunctionCallback2, NULL, NULL, &sqliteCustomFunctionDestructor);
+                                         &sqliteFunctionCallback, NULL, NULL, &sqliteCustomFunctionDestructor);
     env->ReleaseStringUTFChars(nameStr, name);
 
     if (err != SQLITE_OK) {
@@ -919,8 +919,8 @@ static JNINativeMethod sMethods[] =
             (void*)nativeClose },
     { "nativeRegisterCustomFunction", "(JLio/requery/android/database/sqlite/SQLiteCustomFunction;)V",
             (void*)nativeRegisterCustomFunction },
-    { "nativeRegisterCustomFunction2", "(JLio/requery/android/database/sqlite/SQLiteCustomFunction2;)V",
-            (void*)nativeRegisterCustomFunction2 },
+    { "nativeRegisterFunction", "(JLio/requery/android/database/sqlite/SQLiteFunction;)V",
+            (void*)nativeRegisterFunction },
     { "nativeRegisterLocalizedCollators", "(JLjava/lang/String;)V",
             (void*)nativeRegisterLocalizedCollators },
     { "nativePrepareStatement", "(JLjava/lang/String;)J",
@@ -985,13 +985,13 @@ int register_android_database_SQLiteConnection(JNIEnv *env)
     GET_METHOD_ID(gSQLiteCustomFunctionClassInfo.dispatchCallback,
             clazz, "dispatchCallback", "([Ljava/lang/String;)Ljava/lang/String;");
 
-    FIND_CLASS(clazz, "io/requery/android/database/sqlite/SQLiteCustomFunction2");
+    FIND_CLASS(clazz, "io/requery/android/database/sqlite/SQLiteFunction");
 
-    GET_FIELD_ID(gSQLiteCustomFunction2ClassInfo.name, clazz,
+    GET_FIELD_ID(gSQLiteFunctionClassInfo.name, clazz,
             "name", "Ljava/lang/String;");
-    GET_FIELD_ID(gSQLiteCustomFunction2ClassInfo.numArgs, clazz,
+    GET_FIELD_ID(gSQLiteFunctionClassInfo.numArgs, clazz,
             "numArgs", "I");
-    GET_METHOD_ID(gSQLiteCustomFunction2ClassInfo.dispatchCallback,
+    GET_METHOD_ID(gSQLiteFunctionClassInfo.dispatchCallback,
             clazz, "dispatchCallback", "(JJI)V");
 
     FIND_CLASS(clazz, "java/lang/String");
@@ -1005,7 +1005,7 @@ int register_android_database_SQLiteConnection(JNIEnv *env)
 
 extern int register_android_database_SQLiteGlobal(JNIEnv *env);
 extern int register_android_database_SQLiteDebug(JNIEnv *env);
-extern int register_android_database_SQLiteCustomFunction2(JNIEnv *env);
+extern int register_android_database_SQLiteFunction(JNIEnv *env);
 extern int register_android_database_CursorWindow(JNIEnv *env);
 
 } // namespace android
@@ -1020,7 +1020,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   android::register_android_database_SQLiteDebug(env);
   android::register_android_database_SQLiteGlobal(env);
   android::register_android_database_CursorWindow(env);
-  android::register_android_database_SQLiteCustomFunction2(env);
+  android::register_android_database_SQLiteFunction(env);
 
   return JNI_VERSION_1_4;
 }

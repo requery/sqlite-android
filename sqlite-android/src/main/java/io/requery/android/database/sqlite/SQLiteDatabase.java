@@ -874,6 +874,7 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
      * @param function callback to call when the function is executed
      * @hide
      */
+    @Deprecated
     public void addCustomFunction(String name, int numArgs, CustomFunction function) {
         // Create wrapper (also validates arguments).
         SQLiteCustomFunction wrapper = new SQLiteCustomFunction(name, numArgs, function);
@@ -892,7 +893,7 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
     }
 
     /**
-     * Registers a CustomFunction2 callback as a function that can be called from
+     * Registers a Function callback as a function that can be called from
      * SQLite database triggers.
      *
      * @param name the name of the sqlite3 function
@@ -900,18 +901,18 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
      * @param function callback to call when the function is executed
      * @hide
      */
-    public void addCustomFunction2(String name, int numArgs, CustomFunction2 function) {
+    public void addFunction(String name, int numArgs, Function function) {
         // Create wrapper (also validates arguments).
-        SQLiteCustomFunction2 wrapper = new SQLiteCustomFunction2(name, numArgs, function);
+        SQLiteFunction wrapper = new SQLiteFunction(name, numArgs, function);
 
         synchronized (mLock) {
             throwIfNotOpenLocked();
 
-            mConfigurationLocked.customFunction2s.add(wrapper);
+            mConfigurationLocked.functions.add(wrapper);
             try {
                 mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
-                mConfigurationLocked.customFunction2s.remove(wrapper);
+                mConfigurationLocked.functions.remove(wrapper);
                 throw ex;
             }
         }
@@ -2388,7 +2389,10 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
     /**
      * A callback interface for a custom sqlite3 function. This can be used to create a function
      * that can be called from sqlite3 database triggers.
+     *
+     * This interface is deprecated; new code should prefer {@link Function}
      */
+    @Deprecated
     public interface CustomFunction {
         /**
          * Invoked whenever the function is called.
@@ -2398,7 +2402,11 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         String callback(String[] args);
     }
 
-    public interface CustomFunction2 {
+    /**
+     * A callback interface for a custom sqlite3 function. This can be used to create a function
+     * that can be called from sqlite3 database triggers, or used in queries.
+     */
+    public interface Function {
         interface Args {
             byte[] getBlob(int arg);
             String getString(int arg);

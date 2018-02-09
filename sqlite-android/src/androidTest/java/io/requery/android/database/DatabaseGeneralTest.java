@@ -111,8 +111,8 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
     }
 
     @MediumTest
-    public void testCustomFunction2() {
-        mDatabase.addCustomFunction2("roundFunction2", 1, new SQLiteDatabase.CustomFunction2() {
+    public void testNewFunction() {
+        mDatabase.addFunction("roundFunction2", 1, new SQLiteDatabase.Function() {
             @Override
             public void callback(Args args, Result result) {
                 double value = args.getDouble(0);
@@ -140,8 +140,8 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
     }
 
     @MediumTest
-    public void testCustomFunction2NoReturn() {
-        mDatabase.addCustomFunction2("emptyFunction2", 1, new SQLiteDatabase.CustomFunction2() {
+    public void testNewFunctionNoReturn() {
+        mDatabase.addFunction("emptyFunction2", 1, new SQLiteDatabase.Function() {
             @Override
             public void callback(Args args, Result result) {
             }

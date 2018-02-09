@@ -40,10 +40,10 @@ endif
 LOCAL_SRC_FILES:= \
 	android_database_SQLiteCommon.cpp \
 	android_database_SQLiteConnection.cpp \
+	android_database_SQLiteFunction.cpp \
 	android_database_SQLiteGlobal.cpp \
 	android_database_SQLiteDebug.cpp \
 	android_database_CursorWindow.cpp \
-	android_database_SQLiteCustomFunction2.cpp \
 	CursorWindow.cpp \
 	JNIHelp.cpp \
 	JNIString.cpp

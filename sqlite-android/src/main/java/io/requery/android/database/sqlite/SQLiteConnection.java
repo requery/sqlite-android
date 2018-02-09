@@ -131,8 +131,8 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     private static native void nativeClose(long connectionPtr);
     private static native void nativeRegisterCustomFunction(long connectionPtr,
             SQLiteCustomFunction function);
-    private static native void nativeRegisterCustomFunction2(long connectionPtr,
-        SQLiteCustomFunction2 function);
+    private static native void nativeRegisterFunction(long connectionPtr,
+        SQLiteFunction function);
     private static native void nativeRegisterLocalizedCollators(long connectionPtr, String locale);
     private static native long nativePrepareStatement(long connectionPtr, String sql);
     private static native void nativeFinalizeStatement(long connectionPtr, long statementPtr);
@@ -238,18 +238,18 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
             setLocaleFromConfiguration();
         }
 
-        // Register custom functions.
-        final int functionCount = mConfiguration.customFunctions.size();
-        for (int i = 0; i < functionCount; i++) {
+        // Register (deprecated) custom functions.
+        final int customFunctionCount = mConfiguration.customFunctions.size();
+        for (int i = 0; i < customFunctionCount; i++) {
             SQLiteCustomFunction function = mConfiguration.customFunctions.get(i);
             nativeRegisterCustomFunction(mConnectionPtr, function);
         }
 
-        // Register CustomFunction2s.
-        final int function2Count = mConfiguration.customFunction2s.size();
-        for (int i = 0; i < function2Count; i++) {
-            SQLiteCustomFunction2 function = mConfiguration.customFunction2s.get(i);
-            nativeRegisterCustomFunction2(mConnectionPtr, function);
+        // Register functions
+        final int functionCount = mConfiguration.functions.size();
+        for (int i = 0; i < functionCount; i++) {
+            SQLiteFunction function = mConfiguration.functions.get(i);
+            nativeRegisterFunction(mConnectionPtr, function);
         }
 
         // Register custom extensions
@@ -439,21 +439,21 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     void reconfigure(SQLiteDatabaseConfiguration configuration) {
         mOnlyAllowReadOnlyOperations = false;
 
-        // Register custom functions.
-        final int functionCount = configuration.customFunctions.size();
-        for (int i = 0; i < functionCount; i++) {
+        // Register (deprecated) custom functions.
+        final int customFunctionCount = configuration.customFunctions.size();
+        for (int i = 0; i < customFunctionCount; i++) {
             SQLiteCustomFunction function = configuration.customFunctions.get(i);
             if (!mConfiguration.customFunctions.contains(function)) {
                 nativeRegisterCustomFunction(mConnectionPtr, function);
             }
         }
 
-        // Register CustomFunction2s.
-        final int function2Count = configuration.customFunction2s.size();
-        for (int i = 0; i < function2Count; i++) {
-            SQLiteCustomFunction2 function = configuration.customFunction2s.get(i);
-            if (!mConfiguration.customFunction2s.contains(function)) {
-                nativeRegisterCustomFunction2(mConnectionPtr, function);
+        // Register Functions
+        final int functionCount = configuration.functions.size();
+        for (int i = 0; i < functionCount; i++) {
+            SQLiteFunction function = configuration.functions.get(i);
+            if (!mConfiguration.functions.contains(function)) {
+                nativeRegisterFunction(mConnectionPtr, function);
             }
         }
 

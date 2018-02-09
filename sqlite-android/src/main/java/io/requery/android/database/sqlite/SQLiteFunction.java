@@ -3,10 +3,10 @@ package io.requery.android.database.sqlite;
 /**
  * @author dhleong
  */
-public class SQLiteCustomFunction2 {
+public class SQLiteFunction {
     public final String name;
     public final int numArgs;
-    public final SQLiteDatabase.CustomFunction2 callback;
+    public final SQLiteDatabase.Function callback;
 
     // NOTE: from a single database connection, all calls to
     // functions are serialized by SQLITE-internal mutexes,
@@ -22,8 +22,8 @@ public class SQLiteCustomFunction2 {
      * support any number of arguments.
      * @param callback The callback to invoke when the function is executed.
      */
-    public SQLiteCustomFunction2(String name, int numArgs,
-            SQLiteDatabase.CustomFunction2 callback) {
+    public SQLiteFunction(String name, int numArgs,
+            SQLiteDatabase.Function callback) {
         if (name == null) {
             throw new IllegalArgumentException("name must not be null.");
         }
@@ -69,7 +69,7 @@ public class SQLiteCustomFunction2 {
     static native void nativeSetResultError(long contextPtr, String error);
     static native void nativeSetResultNull(long contextPtr);
 
-    private static class MyArgs implements SQLiteDatabase.CustomFunction2.Args {
+    private static class MyArgs implements SQLiteDatabase.Function.Args {
         long argsPtr;
         int argsCount;
 
@@ -109,7 +109,7 @@ public class SQLiteCustomFunction2 {
         }
     }
 
-    private static class MyResult implements SQLiteDatabase.CustomFunction2.Result {
+    private static class MyResult implements SQLiteDatabase.Function.Result {
         long contextPtr;
         boolean isSet;
 
