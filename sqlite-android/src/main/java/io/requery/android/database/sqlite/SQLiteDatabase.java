@@ -22,10 +22,8 @@
 package io.requery.android.database.sqlite;
 
 import android.annotation.SuppressLint;
-import android.arch.persistence.db.SimpleSQLiteQuery;
 import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.db.SupportSQLiteQuery;
-import android.arch.persistence.db.SupportSQLiteStatement;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -44,8 +42,6 @@ import android.util.EventLog;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Printer;
-import io.requery.android.database.DatabaseErrorHandler;
-import io.requery.android.database.DefaultDatabaseErrorHandler;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -57,6 +53,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
+
+import io.requery.android.database.DatabaseErrorHandler;
+import io.requery.android.database.DefaultDatabaseErrorHandler;
 
 /**
  * Exposes methods to manage a SQLite database.
@@ -875,6 +874,7 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
      * @param function callback to call when the function is executed
      * @hide
      */
+    @Deprecated
     public void addCustomFunction(String name, int numArgs, CustomFunction function) {
         // Create wrapper (also validates arguments).
         SQLiteCustomFunction wrapper = new SQLiteCustomFunction(name, numArgs, function);
@@ -887,6 +887,32 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
                 mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.customFunctions.remove(wrapper);
+                throw ex;
+            }
+        }
+    }
+
+    /**
+     * Registers a Function callback as a function that can be called from
+     * SQLite database triggers.
+     *
+     * @param name the name of the sqlite3 function
+     * @param numArgs the number of arguments for the function
+     * @param function callback to call when the function is executed
+     * @hide
+     */
+    public void addFunction(String name, int numArgs, Function function) {
+        // Create wrapper (also validates arguments).
+        SQLiteFunction wrapper = new SQLiteFunction(name, numArgs, function);
+
+        synchronized (mLock) {
+            throwIfNotOpenLocked();
+
+            mConfigurationLocked.functions.add(wrapper);
+            try {
+                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+            } catch (RuntimeException ex) {
+                mConfigurationLocked.functions.remove(wrapper);
                 throw ex;
             }
         }
@@ -2363,7 +2389,10 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
     /**
      * A callback interface for a custom sqlite3 function. This can be used to create a function
      * that can be called from sqlite3 database triggers.
+     *
+     * This interface is deprecated; new code should prefer {@link Function}
      */
+    @Deprecated
     public interface CustomFunction {
         /**
          * Invoked whenever the function is called.
@@ -2371,6 +2400,37 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
          * @return String value of the result or null
          */
         String callback(String[] args);
+    }
+
+    /**
+     * A callback interface for a custom sqlite3 function. This can be used to create a function
+     * that can be called from sqlite3 database triggers, or used in queries.
+     */
+    public interface Function {
+        interface Args {
+            byte[] getBlob(int arg);
+            String getString(int arg);
+            double getDouble(int arg);
+            int getInt(int arg);
+            long getLong(int arg);
+        }
+
+        interface Result {
+            void set(byte[] value);
+            void set(double value);
+            void set(int value);
+            void set(long value);
+            void set(String value);
+            void setError(String error);
+            void setNull();
+        }
+
+        /**
+         * Invoked whenever the function is called.
+         * @param args function arguments
+         * @return String value of the result or null
+         */
+        void callback(Args args, Result result);
     }
 
     static boolean hasCodec() {

@@ -32,8 +32,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 import android.util.Pair;
-import io.requery.android.database.sqlite.SQLiteDatabase;
-import io.requery.android.database.sqlite.SQLiteStatement;
+
 import junit.framework.Assert;
 
 import java.io.File;
@@ -41,6 +40,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
+import io.requery.android.database.sqlite.SQLiteStatement;
 
 @SuppressWarnings({"deprecated", "ResultOfMethodCallIgnored"})
 public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceTestCase {
@@ -109,6 +111,21 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
     }
 
     @MediumTest
+    public void testNewFunction() {
+        mDatabase.addFunction("roundFunction2", 1, new SQLiteDatabase.Function() {
+            @Override
+            public void callback(Args args, Result result) {
+                double value = args.getDouble(0);
+                result.set(Math.round(value));
+            }
+        });
+        Cursor cursor = mDatabase.rawQuery("SELECT roundFunction2(3.14)", null);
+        assertTrue(cursor.moveToFirst());
+        int result = cursor.getInt(0);
+        assertSame(3, result);
+    }
+
+    @MediumTest
     public void testCustomFunctionNoReturn() {
         mDatabase.addCustomFunction("emptyFunction", 1, new SQLiteDatabase.CustomFunction() {
             @Override
@@ -117,6 +134,19 @@ public class DatabaseGeneralTest extends AndroidTestCase implements PerformanceT
             }
         });
         Cursor cursor = mDatabase.rawQuery("SELECT emptyFunction(3.14)", null);
+        // always empty regardless of if sqlite3_result_null is called or not
+        cursor.moveToFirst();
+        assertSame(null, cursor.getString(0));
+    }
+
+    @MediumTest
+    public void testNewFunctionNoReturn() {
+        mDatabase.addFunction("emptyFunction2", 1, new SQLiteDatabase.Function() {
+            @Override
+            public void callback(Args args, Result result) {
+            }
+        });
+        Cursor cursor = mDatabase.rawQuery("SELECT emptyFunction2(3.14)", null);
         // always empty regardless of if sqlite3_result_null is called or not
         cursor.moveToFirst();
         assertSame(null, cursor.getString(0));
