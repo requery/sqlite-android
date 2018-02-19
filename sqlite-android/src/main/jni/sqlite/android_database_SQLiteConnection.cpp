@@ -61,6 +61,7 @@ static struct {
 static struct {
     jfieldID name;
     jfieldID numArgs;
+    jfieldID flags;
     jmethodID dispatchCallback;
 } gSQLiteFunctionClassInfo;
 
@@ -339,11 +340,13 @@ static void nativeRegisterFunction(JNIEnv *env, jclass clazz, jlong connectionPt
     jstring nameStr = jstring(env->GetObjectField(
             functionObj, gSQLiteFunctionClassInfo.name));
     jint numArgs = env->GetIntField(functionObj, gSQLiteFunctionClassInfo.numArgs);
+    jint flags = env->GetIntField(functionObj, gSQLiteFunctionClassInfo.flags);
 
     jobject functionObjGlobal = env->NewGlobalRef(functionObj);
 
     const char* name = env->GetStringUTFChars(nameStr, NULL);
-    int err = sqlite3_create_function_v2(connection->db, name, numArgs, SQLITE_UTF16,
+    int err = sqlite3_create_function_v2(connection->db, name, numArgs,
+                                         SQLITE_UTF16 | flags,
                                          reinterpret_cast<void*>(functionObjGlobal),
                                          &sqliteFunctionCallback, NULL, NULL, &sqliteCustomFunctionDestructor);
     env->ReleaseStringUTFChars(nameStr, name);
@@ -991,6 +994,8 @@ int register_android_database_SQLiteConnection(JNIEnv *env)
             "name", "Ljava/lang/String;");
     GET_FIELD_ID(gSQLiteFunctionClassInfo.numArgs, clazz,
             "numArgs", "I");
+    GET_FIELD_ID(gSQLiteFunctionClassInfo.flags, clazz,
+            "flags", "I");
     GET_METHOD_ID(gSQLiteFunctionClassInfo.dispatchCallback,
             clazz, "dispatchCallback", "(JJI)V");
 
