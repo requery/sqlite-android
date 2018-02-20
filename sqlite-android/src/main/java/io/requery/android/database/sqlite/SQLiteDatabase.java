@@ -902,8 +902,22 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
      * @hide
      */
     public void addFunction(String name, int numArgs, Function function) {
+        addFunction(name, numArgs, function, 0);
+    }
+
+    /**
+     * Registers a Function callback as a function that can be called from
+     * SQLite database triggers.
+     *
+     * @param name the name of the sqlite3 function
+     * @param numArgs the number of arguments for the function
+     * @param function callback to call when the function is executed
+     * @param flags 
+     * @hide
+     */
+    public void addFunction(String name, int numArgs, Function function, int flags) {
         // Create wrapper (also validates arguments).
-        SQLiteFunction wrapper = new SQLiteFunction(name, numArgs, function);
+        SQLiteFunction wrapper = new SQLiteFunction(name, numArgs, function, flags);
 
         synchronized (mLock) {
             throwIfNotOpenLocked();
@@ -2407,6 +2421,12 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
      * that can be called from sqlite3 database triggers, or used in queries.
      */
     public interface Function {
+        /**
+         * Flag that declares this function to be "deterministic,"
+         *  which means it may be used with Indexes on Expressions.
+         */
+        public static final int FLAG_DETERMINISTIC = 0x800;
+
         interface Args {
             byte[] getBlob(int arg);
             String getString(int arg);

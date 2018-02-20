@@ -8,6 +8,9 @@ public class SQLiteFunction {
     public final int numArgs;
     public final SQLiteDatabase.Function callback;
 
+    // accessed from native code
+    final int flags;
+
     // NOTE: from a single database connection, all calls to
     // functions are serialized by SQLITE-internal mutexes,
     // so we save on GC churn by reusing a single, shared instance
@@ -21,9 +24,27 @@ public class SQLiteFunction {
      * @param numArgs The number of arguments for the function, or -1 to
      * support any number of arguments.
      * @param callback The callback to invoke when the function is executed.
+     * @param flags Extra SQLITE flags to pass when creating the function
+     * in native code.
      */
     public SQLiteFunction(String name, int numArgs,
             SQLiteDatabase.Function callback) {
+        this(name, numArgs, callback, 0);
+    }
+
+    /**
+     * Create custom function.
+     *
+     * @param name The name of the sqlite3 function.
+     * @param numArgs The number of arguments for the function, or -1 to
+     * support any number of arguments.
+     * @param callback The callback to invoke when the function is executed.
+     * @param flags Extra SQLITE flags to pass when creating the function
+     * in native code.
+     */
+    public SQLiteFunction(String name, int numArgs,
+            SQLiteDatabase.Function callback,
+            int flags) {
         if (name == null) {
             throw new IllegalArgumentException("name must not be null.");
         }
@@ -31,6 +52,7 @@ public class SQLiteFunction {
         this.name = name;
         this.numArgs = numArgs;
         this.callback = callback;
+        this.flags = flags;
     }
 
     // Called from native.
