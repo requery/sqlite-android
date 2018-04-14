@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 3.23.1
+
+- [SQLite 3.23.1](http://sqlite.org/releaselog/3_23_1.html)
+- Add new enhanced custom function interfaces and methods
+
 ## 3.22.0
 
 - [SQLite 3.22.0](https://sqlite.org/releaselog/3_22_0.html)

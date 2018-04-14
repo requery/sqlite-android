@@ -45,7 +45,7 @@ Usage
 
 ```gradle
 dependencies {
-    compile 'io.requery:sqlite-android:3.22.0'
+    compile 'io.requery:sqlite-android:3.23.1'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -102,7 +102,7 @@ binary.
 Requirements
 ------------
 
-The min SDK level is API level 9 (Gingerbread).
+The min SDK level is API level 14 (Ice Cream Sandwich).
 
 Versioning
 ----------
