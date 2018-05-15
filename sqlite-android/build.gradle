@@ -37,7 +37,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     externalNativeBuild {
-        ndkBuild{
+        ndkBuild {
             path 'src/main/jni/Android.mk'
         }
     }
@@ -158,4 +158,10 @@ task installSqlite(dependsOn: downloadSqlite, type: Copy) {
         eachFile { it.setPath(it.getName()) }
     }
     into 'src/main/jni/sqlite'
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'externalNativeBuildDebug' || task.name == 'externalNativeBuildRelease') {
+        task.dependsOn installSqlite
+    }
 }
