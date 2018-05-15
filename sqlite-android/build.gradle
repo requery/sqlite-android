@@ -160,8 +160,4 @@ task installSqlite(dependsOn: downloadSqlite, type: Copy) {
     into 'src/main/jni/sqlite'
 }
 
-tasks.whenTaskAdded { task ->
-    if (task.name == 'externalNativeBuildDebug' || task.name == 'externalNativeBuildRelease') {
-        task.dependsOn installSqlite
-    }
-}
+preBuild.dependsOn installSqlite
