@@ -34,6 +34,8 @@ import android.os.Build;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.os.CancellationSignal;
 import android.support.v4.os.OperationCanceledException;
@@ -1911,6 +1913,21 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         } finally {
             releaseReference();
         }
+    }
+
+    /**
+     * Verifies that a SQL SELECT statement is valid by compiling it.
+     * If the SQL statement is not valid, this method will throw a {@link SQLiteException}.
+     *
+     * @param sql SQL to be validated
+     * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
+     * If the operation is canceled, then {@link OperationCanceledException} will be thrown
+     * when the query is executed.
+     * @throws SQLiteException if {@code sql} is invalid
+     */
+    public void validateSql(@NonNull String sql, @Nullable CancellationSignal cancellationSignal) {
+             getThreadSession().prepare(sql,
+                     getThreadDefaultConnectionFlags(true), cancellationSignal, null);
     }
 
     /**
