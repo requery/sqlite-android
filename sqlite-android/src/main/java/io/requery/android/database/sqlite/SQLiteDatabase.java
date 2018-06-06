@@ -806,7 +806,8 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
 
     private void open() {
         try {
-            if (!mConfigurationLocked.isInMemoryDb()) {
+            if (!mConfigurationLocked.isInMemoryDb()
+                    && (mConfigurationLocked.openFlags & OPEN_CREATE) != 0) {
                 ensureFile(mConfigurationLocked.path);
             }
             try {
