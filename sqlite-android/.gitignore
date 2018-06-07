@@ -4,3 +4,4 @@
 /src/main/jni/sqlite/sqlite3.c
 /src/main/jni/sqlite.zip
 /src/main/obj
+.externalNativeBuild/
