@@ -78,7 +78,6 @@ The native library is built for the following CPU architectures:
 - `arm64-v8a`
 - `x86`
 - `x86_64`
-- `mips`
 
 However you may not want to include all binaries in your apk. You can exclude certain variants by
 using `packagingOptions`:
