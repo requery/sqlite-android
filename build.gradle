@@ -4,8 +4,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.3'
+        classpath 'org.apache.httpcomponents:httpclient:4.5.3'
     }
 }
 
