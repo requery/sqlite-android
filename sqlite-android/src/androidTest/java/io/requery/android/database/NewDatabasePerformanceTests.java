@@ -19,12 +19,21 @@ package io.requery.android.database;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
-import android.test.PerformanceTestCase;
-import io.requery.android.database.sqlite.SQLiteDatabase;
+import android.support.test.runner.AndroidJUnit4;
+
 import junit.framework.TestCase;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Database Performance Tests
@@ -35,14 +44,14 @@ public class NewDatabasePerformanceTests {
     // Edit this to change the test run times.  The original is 100.
     final static int kMultiplier = 1;
 
-    public static class PerformanceBase extends TestCase
-    implements PerformanceTestCase {
+    public static class PerformanceBase extends TestCase {
         protected static final int CURRENT_DATABASE_VERSION = 42;
         protected SQLiteDatabase mDatabase;
         protected File mDatabaseFile;
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
         @SuppressLint("SdCardPath")
+        @Before
         public void setUp() {
             mDatabaseFile = new File("/sdcard", "perf_database_test.db");
             if (mDatabaseFile.exists()) {
@@ -56,18 +65,10 @@ public class NewDatabasePerformanceTests {
         }
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
+        @After
         public void tearDown() {
             mDatabase.close();
             mDatabaseFile.delete();
-        }
-
-        public boolean isPerformanceOnly() {
-            return true;
-        }
-
-        // These tests can only be run once.
-        public int startPerformance(Intermediates intermediates) {
-            return 0;
         }
 
         public String numberName(int number) {
@@ -111,7 +112,7 @@ public class NewDatabasePerformanceTests {
 
         private String[] statements = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -127,6 +128,7 @@ public class NewDatabasePerformanceTests {
             .execSQL("CREATE TABLE t1(a INTEGER, b INTEGER, c VARCHAR(100))");
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.execSQL(statements[i]);
@@ -143,7 +145,7 @@ public class NewDatabasePerformanceTests {
 
         private String[] statements = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -160,6 +162,7 @@ public class NewDatabasePerformanceTests {
             mDatabase.execSQL("CREATE INDEX i1c ON t1(c)");
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.execSQL(statements[i]);
@@ -177,7 +180,7 @@ public class NewDatabasePerformanceTests {
 
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -198,6 +201,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase
@@ -216,7 +220,7 @@ public class NewDatabasePerformanceTests {
 
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -235,6 +239,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase
@@ -253,7 +258,7 @@ public class NewDatabasePerformanceTests {
 
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -275,6 +280,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase
@@ -291,7 +297,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = kMultiplier;
         private static final String[] COLUMNS = {"t1.a"};
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -314,6 +320,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             mDatabase.query("t1 INNER JOIN t2 ON t1.b = t2.b", COLUMNS, null,
                     null, null, null, null);
@@ -328,7 +335,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = kMultiplier;
         private static final String[] COLUMNS = {"t1.a"};
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -353,6 +360,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             mDatabase.query("t1 INNER JOIN t2 ON t1.b = t2.b", COLUMNS, null,
                     null, null, null, null);
@@ -367,7 +375,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = kMultiplier;
         private static final String[] COLUMNS = {"t1.a"};
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -392,6 +400,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             mDatabase.query("t1 INNER JOIN t2 ON t1.c = t2.c", COLUMNS, null,
                     null, null, null, null);
@@ -408,7 +417,7 @@ public class NewDatabasePerformanceTests {
 
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -441,6 +450,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase
@@ -459,7 +469,7 @@ public class NewDatabasePerformanceTests {
 
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -479,6 +489,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase
@@ -495,7 +506,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = kMultiplier;
         private static final String[] COLUMNS = {"b"};
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -511,6 +522,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t1", COLUMNS, null, null, null, null, null);
@@ -526,7 +538,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = kMultiplier;
         private static final String[] COLUMNS = {"c"};
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -542,6 +554,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t1", COLUMNS, null, null, null, null, null);
@@ -557,7 +570,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = kMultiplier;
         private static final String[] COLUMNS = {"b"};
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -574,6 +587,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t1", COLUMNS, null, null, null, null, null);
@@ -589,7 +603,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = kMultiplier;
         private static final String[] COLUMNS = {"c"};
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -606,6 +620,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t1", COLUMNS, null, null, null, null, null);
@@ -622,7 +637,7 @@ public class NewDatabasePerformanceTests {
         private static final String[] COLUMNS = {"c"};
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -645,6 +660,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase
@@ -660,7 +676,7 @@ public class NewDatabasePerformanceTests {
     public static class DeleteIndexed1000 extends PerformanceBase {
         private static final int SIZE = 10 * kMultiplier;
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -677,6 +693,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.delete("t1", null, null);
@@ -691,7 +708,7 @@ public class NewDatabasePerformanceTests {
     public static class Delete1000 extends PerformanceBase {
         private static final int SIZE = 10 * kMultiplier;
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -707,6 +724,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.delete("t1", null, null);
@@ -722,7 +740,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = 10 * kMultiplier;
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -743,6 +761,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.delete("t1", where[i], null);
@@ -758,7 +777,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = 10 * kMultiplier;
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -780,6 +799,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.delete("t1", where[i], null);
@@ -796,7 +816,7 @@ public class NewDatabasePerformanceTests {
         private String[] where = new String[SIZE];
         ContentValues[] mValues = new ContentValues[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -823,6 +843,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.update("t1", mValues[i], where[i], null);
@@ -839,7 +860,7 @@ public class NewDatabasePerformanceTests {
         private String[] where = new String[SIZE];
         ContentValues[] mValues = new ContentValues[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -864,6 +885,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.update("t1", mValues[i], where[i], null);
@@ -879,7 +901,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = 100 * kMultiplier;
         ContentValues[] mValues = new ContentValues[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -895,6 +917,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.insert("t1", null, mValues[i]);
@@ -910,7 +933,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = 100 * kMultiplier;
         ContentValues[] mValues = new ContentValues[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -927,6 +950,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.insert("t1", null, mValues[i]);
@@ -942,7 +966,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = 100 * kMultiplier;
         ContentValues[] mValues = new ContentValues[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -958,6 +982,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.insert("t1", null, mValues[i]);
@@ -973,7 +998,7 @@ public class NewDatabasePerformanceTests {
         private static final int SIZE = 100 * kMultiplier;
         ContentValues[] mValues = new ContentValues[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -990,6 +1015,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.insert("t1", null, mValues[i]);
@@ -1007,7 +1033,7 @@ public class NewDatabasePerformanceTests {
         private static final String[] COLUMNS = {"t3.a"};
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -1028,6 +1054,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t3", COLUMNS, where[i], null, null, null, null);
@@ -1045,7 +1072,7 @@ public class NewDatabasePerformanceTests {
         private static final String[] COLUMNS = {"t3.a"};
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -1067,6 +1094,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t3", COLUMNS, where[i], null, null, null, null);
@@ -1083,7 +1111,7 @@ public class NewDatabasePerformanceTests {
         private static final String[] COLUMNS = {"t4.a"};
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -1100,6 +1128,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t4", COLUMNS, where[i], null, null, null, null);
@@ -1116,7 +1145,7 @@ public class NewDatabasePerformanceTests {
         private static final String[] COLUMNS = {"t4.a"};
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -1136,6 +1165,7 @@ public class NewDatabasePerformanceTests {
 
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t4", COLUMNS, where[i], null, null, null, null);
@@ -1153,7 +1183,7 @@ public class NewDatabasePerformanceTests {
         private static final String[] COLUMNS = {"t3.a"};
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -1173,6 +1203,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t3", COLUMNS, where[i], null, null, null, null);
@@ -1190,7 +1221,7 @@ public class NewDatabasePerformanceTests {
         private static final String[] COLUMNS = {"t3.a"};
         private String[] where = new String[SIZE];
 
-        @Override
+        @Before
         public void setUp() {
             super.setUp();
             Random random = new Random(42);
@@ -1211,6 +1242,7 @@ public class NewDatabasePerformanceTests {
             }
         }
 
+        @Test
         public void testRun() {
             for (int i = 0; i < SIZE; i++) {
                 mDatabase.query("t3", COLUMNS, where[i], null, null, null, null);

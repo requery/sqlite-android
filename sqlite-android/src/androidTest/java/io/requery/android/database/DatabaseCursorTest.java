@@ -23,11 +23,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Build;
-import android.test.AndroidTestCase;
-import android.test.PerformanceTestCase;
-import android.test.suitebuilder.annotation.LargeTest;
-import android.test.suitebuilder.annotation.MediumTest;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
+import android.support.test.filters.MediumTest;
+import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import io.requery.android.database.sqlite.SQLiteCursor;
 import io.requery.android.database.sqlite.SQLiteCursorDriver;
 import io.requery.android.database.sqlite.SQLiteDatabase;
@@ -38,8 +44,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
-public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTestCase {
+@RunWith(AndroidJUnit4.class)
+public class DatabaseCursorTest {
 
     private static final String sString1 = "this is a test";
     private static final String sString2 = "and yet another test";
@@ -49,10 +62,9 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     private SQLiteDatabase mDatabase;
     private File mDatabaseFile;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        File dbDir = getContext().getDir("tests", Context.MODE_PRIVATE);
+    @Before
+    public void setUp() {
+        File dbDir = InstrumentationRegistry.getTargetContext().getDir("tests", Context.MODE_PRIVATE);
         mDatabaseFile = new File(dbDir, "database_test.db");
 
         if (mDatabaseFile.exists()) {
@@ -63,20 +75,14 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
         mDatabase.setVersion(CURRENT_DATABASE_VERSION);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
         mDatabase.close();
         mDatabaseFile.delete();
-        super.tearDown();
     }
 
     public boolean isPerformanceOnly() {
         return false;
-    }
-
-    // These test can only be run once.
-    public int startPerformance(Intermediates intermediates) {
-        return 1;
     }
 
     private void populateDefaultTable() {
@@ -89,7 +95,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @MediumTest
-    public void testBlob() throws Exception {
+    @Test
+    public void testBlob() {
         // create table
         mDatabase.execSQL(
             "CREATE TABLE test (_id INTEGER PRIMARY KEY, s TEXT, d REAL, l INTEGER, b BLOB);");
@@ -132,13 +139,14 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
         byte[] cBlob =  c.getBlob(bCol);
         assertTrue(Arrays.equals(blob, cBlob));
         assertEquals(s, c.getString(sCol));
-        assertEquals(d, c.getDouble(dCol));
+        assertEquals(d, new Double(c.getDouble(dCol)));
         assertEquals((long)l, c.getLong(lCol));
         c.close();
     }
     
     @MediumTest
-    public void testRealColumns() throws Exception {
+    @Test
+    public void testRealColumns() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data REAL);");
         ContentValues values = new ContentValues();
         values.put("data", 42.11);
@@ -147,12 +155,13 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
         Cursor c = mDatabase.rawQuery("SELECT data FROM test", null);
         assertNotNull(c);
         assertTrue(c.moveToFirst());
-        assertEquals(42.11, c.getDouble(0));
+        assertEquals(42.11, c.getDouble(0), 0);
         c.close();
     }
 
     @MediumTest
-    public void testCursor1() throws Exception {
+    @Test
+    public void testCursor1() {
         populateDefaultTable();
 
         Cursor c = mDatabase.query("test", null, null, null, null, null, null);
@@ -216,7 +225,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @MediumTest
-    public void testCursor2() throws Exception {
+    @Test
+    public void testCursor2() {
         populateDefaultTable();
 
         Cursor c = mDatabase.query("test", null, "_id > 1000", null, null, null, null);
@@ -245,7 +255,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @MediumTest
-    public void testLargeField() throws Exception {
+    @Test
+    public void testLargeField() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data TEXT);");
 
         StringBuilder sql = new StringBuilder(2100);
@@ -272,7 +283,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @LargeTest
-    public void testManyRowsLong() throws Exception {
+    @Test
+    public void testManyRowsLong() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
         
         final int count = 36799; 
@@ -298,7 +310,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @LargeTest
-    public void testManyRowsTxt() throws Exception {
+    @Test
+    public void testManyRowsTxt() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data TEXT);");
         StringBuilder sql = new StringBuilder(2100);
         sql.append("INSERT INTO test (data) VALUES ('");
@@ -332,7 +345,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
     
     @LargeTest
-    public void testManyRowsTxtLong() throws Exception {
+    @Test
+    public void testManyRowsTxtLong() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, txt TEXT, data INT);");
         
         Random random = new Random(System.currentTimeMillis());
@@ -370,7 +384,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
    
     @MediumTest
-    public void testRequery() throws Exception {
+    @Test
+    public void testRequery() {
         populateDefaultTable();
 
         Cursor c = mDatabase.rawQuery("SELECT * FROM test", null);
@@ -383,7 +398,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @MediumTest
-    public void testRequeryWithSelection() throws Exception {
+    @Test
+    public void testRequeryWithSelection() {
         populateDefaultTable();
 
         Cursor c = mDatabase.rawQuery("SELECT data FROM test WHERE data = '" + sString1 + "'",
@@ -401,7 +417,8 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @MediumTest
-    public void testRequeryWithSelectionArgs() throws Exception {
+    @Test
+    public void testRequeryWithSelectionArgs() {
         populateDefaultTable();
 
         Cursor c = mDatabase.rawQuery("SELECT data FROM test WHERE data = ?",
@@ -419,10 +436,9 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @MediumTest
-    public void testRequeryWithAlteredSelectionArgs() throws Exception {
-        /**
-         * Test the ability of a subclass of SQLiteCursor to change its query arguments.
-         */
+    @Test
+    public void testRequeryWithAlteredSelectionArgs() {
+        // Test the ability of a subclass of SQLiteCursor to change its query arguments.
         populateDefaultTable();
 
         SQLiteDatabase.CursorFactory factory = new SQLiteDatabase.CursorFactory() {
@@ -466,6 +482,7 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
      * This test is for that scenario.
      */
     @LargeTest
+    @Test
     public void testCursorWindowFailureWhenTooManyCursorWindowsLeftOpen() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data TEXT);");
         mDatabase.execSQL("INSERT INTO test values(1, 'test');");

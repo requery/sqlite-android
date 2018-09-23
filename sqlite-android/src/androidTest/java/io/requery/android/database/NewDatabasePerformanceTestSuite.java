@@ -17,10 +17,14 @@
 
 package io.requery.android.database;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import junit.framework.TestSuite;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
 
 @Ignore
+@RunWith(AndroidJUnit4.class)
 public class NewDatabasePerformanceTestSuite extends TestSuite {
 
     public static TestSuite suite() {
