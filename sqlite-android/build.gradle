@@ -5,6 +5,7 @@ plugins {
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'de.undercouch.download'
 
 group = 'io.requery'
 version = '3.24.0'
