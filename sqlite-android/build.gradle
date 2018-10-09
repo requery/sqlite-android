@@ -1,21 +1,19 @@
 plugins {
-    id 'de.undercouch.download' version '2.1.0'
+    id 'de.undercouch.download' version '3.4.3'
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
-apply plugin: 'de.undercouch.download'
 apply plugin: 'com.jfrog.bintray'
-
-import de.undercouch.gradle.tasks.download.Download
+apply plugin: 'de.undercouch.download'
 
 group = 'io.requery'
 version = '3.25.2'
 description = 'Android SQLite compatibility library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "27.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.2"
 
     defaultConfig {
         minSdkVersion 14
@@ -47,10 +45,10 @@ android {
 }
 
 dependencies {
-    implementation 'android.arch.persistence:db:1.0.0'
-    implementation 'com.android.support:support-core-utils:26.1.0'
-    androidTestImplementation 'com.android.support.test:runner:0.5'
-    androidTestImplementation 'com.android.support.test:rules:0.5'
+    implementation 'android.arch.persistence:db:1.1.1'
+    implementation 'com.android.support:support-core-utils:28.0.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
 }
 
 publish.dependsOn "assembleRelease"
@@ -59,7 +57,7 @@ bintrayUpload.dependsOn "assembleRelease"
 ext {
     sqliteDistributionUrl = 'http://sqlite.org/2018/sqlite-amalgamation-3250200.zip'
     pomXml = {
-        resolveStrategy = Closure.DELEGATE_FIRST
+        resolveStrategy = DELEGATE_FIRST
         name project.name
         description project.description
         url 'https://github.com/requery/sqlite-android'

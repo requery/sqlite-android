@@ -20,9 +20,16 @@ package io.requery.android.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteException;
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.Suppress;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.Suppress;
+import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
 import java.io.BufferedWriter;
@@ -30,20 +37,25 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @Suppress // https://code.google.com/p/android/issues/detail?id=125986
 // not clear how this test ever worked
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class DatabaseErrorHandlerTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class DatabaseErrorHandlerTest {
 
     private SQLiteDatabase mDatabase;
     private File mDatabaseFile;
     private static final String DB_NAME = "database_test.db";
     private File dbDir;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        dbDir = getContext().getDir(this.getClass().getName(), Context.MODE_PRIVATE);
+    @Before
+    public void setUp() {
+        dbDir = InstrumentationRegistry.getTargetContext().getDir(this.getClass().getName(), Context.MODE_PRIVATE);
         mDatabaseFile = new File(dbDir, DB_NAME);
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();
@@ -53,13 +65,13 @@ public class DatabaseErrorHandlerTest extends AndroidTestCase {
         assertNotNull(mDatabase);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
         mDatabase.close();
         mDatabaseFile.delete();
-        super.tearDown();
     }
 
+    @Test
     public void testNoCorruptionCase() {
         new MyDatabaseCorruptionHandler().onCorruption(mDatabase);
         // database file should still exist
@@ -67,6 +79,7 @@ public class DatabaseErrorHandlerTest extends AndroidTestCase {
     }
 
 
+    @Test
     public void testDatabaseIsCorrupt() throws IOException {
         mDatabase.execSQL("create table t (i int);");
         // write junk into the database file
@@ -80,11 +93,11 @@ public class DatabaseErrorHandlerTest extends AndroidTestCase {
             mDatabase.execSQL("select * from t;");
             fail("expected exception");
         } catch (SQLiteDiskIOException e) {
-            /**
-             * this test used to produce a corrupted db. but with new sqlite it instead reports
-             * Disk I/O error. meh..
-             * need to figure out how to cause corruption in db
-             */
+            //
+            // this test used to produce a corrupted db. but with new sqlite it instead reports
+            // Disk I/O error. meh..
+            // need to figure out how to cause corruption in db
+            //
             // expected
             if (mDatabaseFile.exists()) {
                 mDatabaseFile.delete();

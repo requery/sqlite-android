@@ -18,18 +18,28 @@
 package io.requery.android.database;
 
 import android.database.Cursor;
-import android.test.MoreAsserts;
-import android.test.suitebuilder.annotation.MediumTest;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.test.suitebuilder.annotation.Suppress;
+import android.support.test.filters.MediumTest;
+import android.support.test.filters.SmallTest;
+import android.support.test.filters.Suppress;
+import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 import io.requery.android.database.sqlite.SQLiteDatabase;
-import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class DatabaseLocaleTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class DatabaseLocaleTest {
 
     private SQLiteDatabase mDatabase;
 
@@ -43,9 +53,8 @@ public class DatabaseLocaleTest extends TestCase {
         "COTE",
     };
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         mDatabase = SQLiteDatabase.create(null);
         mDatabase.execSQL(
                 "CREATE TABLE test (id INTEGER PRIMARY KEY, data TEXT COLLATE LOCALIZED);");
@@ -57,16 +66,15 @@ public class DatabaseLocaleTest extends TestCase {
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
         mDatabase.close();
-        super.tearDown();
     }
 
     private String[] query(String sql) {
         Log.i("LocaleTest", "Querying: " + sql);
         Cursor c = mDatabase.rawQuery(sql, null);
-        assertNotNull(c);
+        Assert.assertNotNull(c);
         ArrayList<String> items = new ArrayList<>();
         while (c.moveToNext()) {
             items.add(c.getString(0));
@@ -79,15 +87,17 @@ public class DatabaseLocaleTest extends TestCase {
     }
 
     @MediumTest
-    public void testLocaleInsertOrder() throws Exception {
+    @Test
+    public void testLocaleInsertOrder() {
         insertStrings();
         String[] results = query("SELECT data FROM test");
-        MoreAsserts.assertEquals(STRINGS, results);
+        assertEquals(STRINGS, results);
     }
 
     @Suppress // not supporting localized collators
     @MediumTest
-    public void testLocaleenUS() throws Exception {
+    @Test
+    public void testLocaleenUS() {
         insertStrings();
         Log.i("LocaleTest", "about to call setLocale en_US");
         mDatabase.setLocale(new Locale("en", "US"));
@@ -97,7 +107,7 @@ public class DatabaseLocaleTest extends TestCase {
         // The database code currently uses PRIMARY collation strength,
         // meaning that all versions of a character compare equal (regardless
         // of case or accents), leaving the "cote" flavors in database order.
-        MoreAsserts.assertEquals(results, new String[] {
+        assertEquals(results, new String[] {
                 STRINGS[4],  // "boy"
                 STRINGS[0],  // sundry forms of "cote"
                 STRINGS[1],
@@ -109,6 +119,7 @@ public class DatabaseLocaleTest extends TestCase {
     }
 
     @SmallTest
+    @Test
     public void testHoge() throws Exception {
         Cursor cursor = null;
         try {

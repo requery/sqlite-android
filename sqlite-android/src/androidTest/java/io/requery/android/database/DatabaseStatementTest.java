@@ -21,16 +21,28 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDoneException;
-import android.test.AndroidTestCase;
-import android.test.PerformanceTestCase;
-import android.test.suitebuilder.annotation.MediumTest;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.MediumTest;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteStatement;
 
 import java.io.File;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class DatabaseStatementTest extends AndroidTestCase implements PerformanceTestCase {
+@RunWith(AndroidJUnit4.class)
+public class DatabaseStatementTest {
 
     private static final String sString1 = "this is a test";
     private static final String sString2 = "and yet another test";
@@ -40,10 +52,9 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     private SQLiteDatabase mDatabase;
     private File mDatabaseFile;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        File dbDir = getContext().getDir("tests", Context.MODE_PRIVATE);
+    @Before
+    public void setUp() {
+        File dbDir = InstrumentationRegistry.getTargetContext().getDir("tests", Context.MODE_PRIVATE);
         mDatabaseFile = new File(dbDir, "database_test.db");
 
         if (mDatabaseFile.exists()) {
@@ -54,20 +65,14 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
         mDatabase.setVersion(CURRENT_DATABASE_VERSION);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
         mDatabase.close();
         mDatabaseFile.delete();
-        super.tearDown();
     }
 
     public boolean isPerformanceOnly() {
         return false;
-    }
-
-    // These test can only be run once.
-    public int startPerformance(Intermediates intermediates) {
-        return 1;
     }
 
     private void populateDefaultTable() {
@@ -79,7 +84,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testExecuteStatement() throws Exception {
+    @Test
+    public void testExecuteStatement() {
         populateDefaultTable();
         SQLiteStatement statement = mDatabase.compileStatement("DELETE FROM test");
         statement.execute();
@@ -91,7 +97,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testSimpleQuery() throws Exception {
+    @Test
+    public void testSimpleQuery() {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER NOT NULL, str TEXT NOT NULL);");
         mDatabase.execSQL("INSERT INTO test VALUES (1234, 'hello');");
         SQLiteStatement statement1 =
@@ -128,7 +135,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testStatementLongBinding() throws Exception {
+    @Test
+    public void testStatementLongBinding() {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER);");
         SQLiteStatement statement = mDatabase.compileStatement("INSERT INTO test (num) VALUES (?)");
 
@@ -150,7 +158,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testStatementStringBinding() throws Exception {
+    @Test
+    public void testStatementStringBinding() {
         mDatabase.execSQL("CREATE TABLE test (num TEXT);");
         SQLiteStatement statement = mDatabase.compileStatement("INSERT INTO test (num) VALUES (?)");
 
@@ -172,7 +181,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testStatementClearBindings() throws Exception {
+    @Test
+    public void testStatementClearBindings() {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER);");
         SQLiteStatement statement = mDatabase.compileStatement("INSERT INTO test (num) VALUES (?)");
 
@@ -194,7 +204,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testSimpleStringBinding() throws Exception {
+    @Test
+    public void testSimpleStringBinding() {
         mDatabase.execSQL("CREATE TABLE test (num TEXT, value TEXT);");
         String statement = "INSERT INTO test (num, value) VALUES (?,?)";
 
@@ -218,7 +229,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testStatementMultipleBindings() throws Exception {
+    @Test
+    public void testStatementMultipleBindings() {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER, str TEXT);");
         SQLiteStatement statement =
                 mDatabase.compileStatement("INSERT INTO test (num, str) VALUES (?, ?)");
@@ -248,7 +260,7 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
         private SQLiteDatabase mDatabase;
         private SQLiteStatement mStatement;
 
-        public StatementTestThread(SQLiteDatabase db, SQLiteStatement statement) {
+        private StatementTestThread(SQLiteDatabase db, SQLiteStatement statement) {
             super();
             mDatabase = db;
             mStatement = statement;
@@ -281,6 +293,7 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
+    @Test
     public void testStatementMultiThreaded() throws Exception {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER, str TEXT);");
         SQLiteStatement statement =
@@ -296,7 +309,8 @@ public class DatabaseStatementTest extends AndroidTestCase implements Performanc
     }
 
     @MediumTest
-    public void testStatementConstraint() throws Exception {
+    @Test
+    public void testStatementConstraint() {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER NOT NULL);");
         SQLiteStatement statement = mDatabase.compileStatement("INSERT INTO test (num) VALUES (?)");
 
