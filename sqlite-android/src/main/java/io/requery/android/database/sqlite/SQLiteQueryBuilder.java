@@ -21,9 +21,9 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.OperationCanceledException;
 import android.provider.BaseColumns;
-import android.support.v4.os.CancellationSignal;
 import android.text.TextUtils;
 import android.util.Log;
+import androidx.core.os.CancellationSignal;
 
 import java.util.Iterator;
 import java.util.Map;

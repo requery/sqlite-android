@@ -24,10 +24,10 @@ package io.requery.android.database.sqlite;
 import android.annotation.SuppressLint;
 import android.database.sqlite.SQLiteException;
 import android.os.SystemClock;
-import android.support.v4.os.CancellationSignal;
-import android.support.v4.os.OperationCanceledException;
 import android.util.Log;
 import android.util.Printer;
+import androidx.core.os.CancellationSignal;
+import androidx.core.os.OperationCanceledException;
 
 import java.io.Closeable;
 import java.util.ArrayList;

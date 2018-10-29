@@ -17,10 +17,10 @@
 
 package io.requery.android.database.sqlite;
 
-import android.arch.persistence.db.SupportSQLiteOpenHelper;
 import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import io.requery.android.database.DatabaseErrorHandler;
 
 /**

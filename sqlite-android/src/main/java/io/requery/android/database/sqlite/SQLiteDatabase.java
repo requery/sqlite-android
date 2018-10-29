@@ -22,8 +22,6 @@
 package io.requery.android.database.sqlite;
 
 import android.annotation.SuppressLint;
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.db.SupportSQLiteQuery;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -33,17 +31,21 @@ import android.database.sqlite.SQLiteTransactionListener;
 import android.os.Build;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.os.CancellationSignal;
-import android.support.v4.os.OperationCanceledException;
 import android.text.TextUtils;
 import android.util.EventLog;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Printer;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.os.CancellationSignal;
+import androidx.core.os.OperationCanceledException;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.sqlite.db.SupportSQLiteQuery;
+import io.requery.android.database.DatabaseErrorHandler;
+import io.requery.android.database.DefaultDatabaseErrorHandler;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -55,9 +57,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
-
-import io.requery.android.database.DatabaseErrorHandler;
-import io.requery.android.database.DefaultDatabaseErrorHandler;
 
 /**
  * Exposes methods to manage a SQLite database.

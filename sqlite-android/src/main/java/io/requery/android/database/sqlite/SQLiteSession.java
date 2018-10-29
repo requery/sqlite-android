@@ -25,9 +25,9 @@ import android.annotation.SuppressLint;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteTransactionListener;
 import android.os.ParcelFileDescriptor;
+import androidx.core.os.CancellationSignal;
+import androidx.core.os.OperationCanceledException;
 import io.requery.android.database.CursorWindow;
-import android.support.v4.os.CancellationSignal;
-import android.support.v4.os.OperationCanceledException;
 
 /**
  * Provides a single client the ability to use a database.

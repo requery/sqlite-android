@@ -17,11 +17,11 @@
 
 package io.requery.android.database.sqlite;
 
-import android.arch.persistence.db.SupportSQLiteStatement;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteDoneException;
 import android.os.ParcelFileDescriptor;
+import androidx.sqlite.db.SupportSQLiteStatement;
 
 /**
  * Represents a statement that can be executed against a database.  The statement

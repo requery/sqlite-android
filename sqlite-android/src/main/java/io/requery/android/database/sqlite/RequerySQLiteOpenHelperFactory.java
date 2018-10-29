@@ -1,13 +1,10 @@
 package io.requery.android.database.sqlite;
 
-import android.arch.persistence.db.SupportSQLiteOpenHelper;
-import android.arch.persistence.db.SupportSQLiteOpenHelper.Callback;
-import android.arch.persistence.db.SupportSQLiteOpenHelper.Configuration;
 import android.content.Context;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
+import io.requery.android.database.DatabaseErrorHandler;
 
 import java.util.Collections;
-
-import io.requery.android.database.DatabaseErrorHandler;
 
 /**
  * Implements {@link SupportSQLiteOpenHelper.Factory} using the SQLite implementation shipped in
@@ -27,16 +24,16 @@ public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHe
     }
 
     @Override
-    public SupportSQLiteOpenHelper create(Configuration config) {
+    public SupportSQLiteOpenHelper create(SupportSQLiteOpenHelper.Configuration config) {
         return new CallbackSQLiteOpenHelper(config.context, config.name, config.callback, configurationOptions);
     }
 
     private static final class CallbackSQLiteOpenHelper extends SQLiteOpenHelper {
 
-        private final Callback callback;
+        private final SupportSQLiteOpenHelper.Callback callback;
         private final Iterable<ConfigurationOptions> configurationOptions;
 
-        CallbackSQLiteOpenHelper(Context context, String name, Callback cb, Iterable<ConfigurationOptions> ops) {
+        CallbackSQLiteOpenHelper(Context context, String name, SupportSQLiteOpenHelper.Callback cb, Iterable<ConfigurationOptions> ops) {
             super(context, name, null, cb.version, new CallbackDatabaseErrorHandler(cb));
             this.callback = cb;
             this.configurationOptions = ops;
@@ -80,9 +77,9 @@ public final class RequerySQLiteOpenHelperFactory implements SupportSQLiteOpenHe
 
     private static final class CallbackDatabaseErrorHandler implements DatabaseErrorHandler {
 
-        private final Callback callback;
+        private final SupportSQLiteOpenHelper.Callback callback;
 
-        CallbackDatabaseErrorHandler(Callback callback) {
+        CallbackDatabaseErrorHandler(SupportSQLiteOpenHelper.Callback callback) {
             this.callback = callback;
         }
 
