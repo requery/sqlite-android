@@ -22,6 +22,8 @@ import android.util.SparseIntArray;
 import io.requery.android.database.AbstractWindowedCursor;
 import io.requery.android.database.CursorWindow;
 
+import java.util.HashMap;
+
 /**
  * A Cursor implementation that exposes results from a query on a {@link SQLiteDatabase}.
  *
@@ -48,7 +50,8 @@ public class SQLiteCursor extends AbstractWindowedCursor {
     private int mCursorWindowCapacity;
 
     /** A mapping of column names to column indices, to speed up lookups */
-    private SparseIntArray mColumnNameMap;
+    private SparseIntArray mColumnNameArray;
+    private HashMap<String, Integer> mColumnNameMap;
 
     /** Used to find out where a cursor was allocated in case it never got released. */
     private final CloseGuard mCloseGuard;
@@ -70,7 +73,6 @@ public class SQLiteCursor extends AbstractWindowedCursor {
             throw new IllegalArgumentException("query object cannot be null");
         }
         mDriver = driver;
-        mColumnNameMap = null;
         mQuery = query;
         mCloseGuard = CloseGuard.get();
         mColumns = query.getColumnNames();
@@ -137,14 +139,29 @@ public class SQLiteCursor extends AbstractWindowedCursor {
     @Override
     public int getColumnIndex(String columnName) {
         // Create mColumnNameMap on demand
-        if (mColumnNameMap == null) {
+        if (mColumnNameArray == null && mColumnNameMap == null) {
             String[] columns = mColumns;
             int columnCount = columns.length;
             SparseIntArray map = new SparseIntArray(columnCount);
+            boolean collision = false;
             for (int i = 0; i < columnCount; i++) {
-                map.put(columns[i].hashCode(), i);
+                int key = columns[i].hashCode();
+                // check for hashCode collision
+                if (map.get(key, -1) != -1) {
+                    collision = true;
+                    break;
+                }
+                map.put(key, i);
             }
-            mColumnNameMap = map;
+
+            if (collision) {
+                mColumnNameMap = new HashMap<>();
+                for (int i = 0; i < columnCount; i++) {
+                    mColumnNameMap.put(columns[i], i);
+                }
+            } else {
+                mColumnNameArray = map;
+            }
         }
 
         // Hack according to bug 903852
@@ -155,7 +172,12 @@ public class SQLiteCursor extends AbstractWindowedCursor {
             columnName = columnName.substring(periodIndex + 1);
         }
 
-        return mColumnNameMap.get(columnName.hashCode(), -1);
+        if (mColumnNameMap != null) {
+            Integer i = mColumnNameMap.get(columnName);
+            return i == null ? -1 : i;
+        } else {
+            return mColumnNameArray.get(columnName.hashCode(), -1);
+        }
     }
 
     @Override
