@@ -4,6 +4,9 @@ Change Log
 ## 3.25.3
 
 - [SQLite 3.25.3](http://sqlite.org/releaselog/3_25_3.html)
+- Switch to androidx libraries
+- Remove mips abi support
+- Fix hash collision in SQLiteCursor
 
 ## 3.25.2
 
