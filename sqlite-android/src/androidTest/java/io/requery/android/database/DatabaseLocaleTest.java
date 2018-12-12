@@ -18,11 +18,12 @@
 package io.requery.android.database;
 
 import android.database.Cursor;
-import android.support.test.filters.MediumTest;
-import android.support.test.filters.SmallTest;
-import android.support.test.filters.Suppress;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.filters.SmallTest;
+import androidx.test.filters.Suppress;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
 import org.junit.After;

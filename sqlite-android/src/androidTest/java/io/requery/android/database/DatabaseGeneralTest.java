@@ -24,12 +24,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteException;
 import android.os.Parcel;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.LargeTest;
-import android.support.test.filters.MediumTest;
-import android.support.test.filters.SmallTest;
-import android.support.test.filters.Suppress;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 import android.util.Pair;
 
@@ -46,6 +40,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.filters.MediumTest;
+import androidx.test.filters.SmallTest;
+import androidx.test.filters.Suppress;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteStatement;
 
@@ -72,7 +72,7 @@ public class DatabaseGeneralTest {
 
     @Before
     public void setUp() {
-        File dbDir = InstrumentationRegistry.getTargetContext().getDir(this.getClass().getName(), Context.MODE_PRIVATE);
+        File dbDir = ApplicationProvider.getApplicationContext().getDir(this.getClass().getName(), Context.MODE_PRIVATE);
         mDatabaseFile = new File(dbDir, "database_test.db");
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();

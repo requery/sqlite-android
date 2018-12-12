@@ -20,9 +20,6 @@ package io.requery.android.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteException;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.Suppress;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
 import org.junit.After;
@@ -30,6 +27,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.Suppress;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
 import java.io.BufferedWriter;
@@ -55,7 +55,7 @@ public class DatabaseErrorHandlerTest {
 
     @Before
     public void setUp() {
-        dbDir = InstrumentationRegistry.getTargetContext().getDir(this.getClass().getName(), Context.MODE_PRIVATE);
+        dbDir = ApplicationProvider.getApplicationContext().getDir(this.getClass().getName(), Context.MODE_PRIVATE);
         mDatabaseFile = new File(dbDir, DB_NAME);
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();

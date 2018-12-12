@@ -3,6 +3,11 @@ Change Log
 
 ## 3.26.0
 - [SQLite 3.26.0](http://sqlite.org/releaselog/3_26_0.html)
+- Update `org.apache.httpcomponents:httpclient` dependency to 4.5.6
+- Update `com.android.tools.build:gradle` dependency to 3.2.1
+- Update gradle to 4.10.2
+- Update `androidx.core:core` dependency to 1.0.1
+- Switch to androidx for test libraries
 
 ## 3.25.3
 
