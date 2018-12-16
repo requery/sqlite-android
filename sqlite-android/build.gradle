@@ -8,17 +8,16 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'de.undercouch.download'
 
 group = 'io.requery'
-version = '3.25.3'
+version = '3.26.0'
 description = 'Android SQLite compatibility library'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.2"
 
     defaultConfig {
         minSdkVersion 14
         versionName project.version
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'proguard-rules.pro'
         ndk {
             abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
@@ -46,16 +45,18 @@ android {
 
 dependencies {
     api 'androidx.sqlite:sqlite:2.0.0'
-    api 'androidx.core:core:1.0.0'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    api 'androidx.core:core:1.0.1'
+    androidTestImplementation 'androidx.test:core:1.0.0'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test:rules:1.1.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.0.0'
 }
 
 publish.dependsOn "assembleRelease"
 bintrayUpload.dependsOn "assembleRelease"
 
 ext {
-    sqliteDistributionUrl = 'http://sqlite.org/2018/sqlite-amalgamation-3250300.zip'
+    sqliteDistributionUrl = 'http://sqlite.org/2018/sqlite-amalgamation-3260000.zip'
     pomXml = {
         resolveStrategy = DELEGATE_FIRST
         name project.name

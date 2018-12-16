@@ -23,10 +23,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Build;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.LargeTest;
-import android.support.test.filters.MediumTest;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
 import org.junit.After;
@@ -34,6 +30,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.filters.MediumTest;
 import io.requery.android.database.sqlite.SQLiteCursor;
 import io.requery.android.database.sqlite.SQLiteCursorDriver;
 import io.requery.android.database.sqlite.SQLiteDatabase;
@@ -64,7 +64,7 @@ public class DatabaseCursorTest {
 
     @Before
     public void setUp() {
-        File dbDir = InstrumentationRegistry.getTargetContext().getDir("tests", Context.MODE_PRIVATE);
+        File dbDir = ApplicationProvider.getApplicationContext().getDir("tests", Context.MODE_PRIVATE);
         mDatabaseFile = new File(dbDir, "database_test.db");
 
         if (mDatabaseFile.exists()) {
