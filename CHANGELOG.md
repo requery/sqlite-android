@@ -1,6 +1,9 @@
 Change Log
 ==========
 
+## 3.27.1
+- [SQLite 3.27.1](http://sqlite.org/releaselog/3_27_1.html)
+
 ## 3.26.0
 - [SQLite 3.26.0](http://sqlite.org/releaselog/3_26_0.html)
 - Update `org.apache.httpcomponents:httpclient` dependency to 4.5.6
