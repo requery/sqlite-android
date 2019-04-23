@@ -85,10 +85,10 @@ using `packagingOptions`:
 ```gradle
 android {
     packagingOptions {
+        exclude 'lib/armeabi-v7a/libsqlite3x.so'
         exclude 'lib/arm64-v8a/libsqlite3x.so'
         exclude 'lib/x86/libsqlite3x.so'
         exclude 'lib/x86_64/libsqlite3x.so'
-        exclude 'lib/mips/libsqlite3x.so'
     }
 }
 ```
@@ -97,6 +97,8 @@ The size of the artifacts with only the armeabi-v7a binary is **~600kb**. In gen
 armeabi-v7a on the majority of Android devices including Intel Atom which provides a native
 translation layer, however performance under the translation layer is worse than using the x86
 binary.
+
+Note that starting August 1, 2019, your apps published on Google Play will [need to support 64-bit architectures](https://developer.android.com/distribute/best-practices/develop/64-bit).
 
 Requirements
 ------------
