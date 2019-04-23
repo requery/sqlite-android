@@ -56,7 +56,7 @@ publish.dependsOn "assembleRelease"
 bintrayUpload.dependsOn "assembleRelease"
 
 ext {
-    sqliteDistributionUrl = 'http://sqlite.org/2019/sqlite-amalgamation-3280000.zip'
+    sqliteDistributionUrl = 'https://sqlite.org/2019/sqlite-amalgamation-3280000.zip'
     pomXml = {
         resolveStrategy = DELEGATE_FIRST
         name project.name
