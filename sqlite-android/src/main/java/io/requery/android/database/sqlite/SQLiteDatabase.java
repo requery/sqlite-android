@@ -826,7 +826,7 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         File file = new File(path);
         if (!file.exists()) {
             try {
-                if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
                     // Fixes #103: Check parent directory's existence before
                     // attempting to create.
                     if (!file.getParentFile().mkdirs()) {
