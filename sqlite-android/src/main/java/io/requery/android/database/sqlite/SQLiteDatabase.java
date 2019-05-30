@@ -1348,14 +1348,18 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
     @Override
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public Cursor query(SupportSQLiteQuery supportQuery, android.os.CancellationSignal signal) {
-        final CancellationSignal supportCancellationSignal = new CancellationSignal();
-        signal.setOnCancelListener(new android.os.CancellationSignal.OnCancelListener() {
-            @Override
-            public void onCancel() {
-                supportCancellationSignal.cancel();
-            }
-        });
-        return query(supportQuery, supportCancellationSignal);
+        if(signal != null){
+            final CancellationSignal supportCancellationSignal = supportCancellationSignal= new CancellationSignal();
+            signal.setOnCancelListener(new android.os.CancellationSignal.OnCancelListener() {
+                @Override
+                public void onCancel() {
+                    supportCancellationSignal.cancel();
+                }
+            });
+            return query(supportQuery, supportCancellationSignal);
+        } else {
+            return query(supportQuery, null);
+        }
     }
 
     /**
