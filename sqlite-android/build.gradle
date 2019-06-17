@@ -41,6 +41,10 @@ android {
             path 'src/main/jni/Android.mk'
         }
     }
+
+    libraryVariants.all {
+        it.generateBuildConfigProvider.configure { enabled = false }
+    }
 }
 
 dependencies {
