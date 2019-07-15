@@ -20,7 +20,8 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'proguard-rules.pro'
         ndk {
-            abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
+            abiFilters 'armeabi-v7a'
+//            ,'arm64-v8a','x86','x86_64'
         }
     }
     buildTypes {
@@ -160,10 +161,10 @@ task downloadSqlite(type: Download) {
 
 task installSqlite(dependsOn: downloadSqlite, type: Copy) {
     from zipTree(downloadSqlite.dest).matching {
-        include '*/sqlite3.*'
+        include '*/*.*'
         eachFile { it.setPath(it.getName()) }
     }
     into 'src/main/jni/sqlite'
 }
 
-preBuild.dependsOn installSqlite
+//preBuild.dependsOn installSqlite

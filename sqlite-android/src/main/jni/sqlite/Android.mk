@@ -26,6 +26,7 @@ sqlite_flags := \
 	-DSQLITE_OMIT_BUILTIN_TEST \
 	-DSQLITE_OMIT_COMPILEOPTION_DIAGS \
 	-DSQLITE_DEFAULT_FILE_PERMISSIONS=0600
+#	-DSQLITE_OMIT_LOAD_EXTENSION=1
 
 LOCAL_CFLAGS += $(sqlite_flags)
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-int-to-pointer-cast
@@ -50,6 +51,7 @@ LOCAL_SRC_FILES:= \
 	JNIHelp.cpp \
 	JNIString.cpp
 
+LOCAL_SRC_FILES += extension-functions.c
 LOCAL_SRC_FILES += sqlite3.c
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)
