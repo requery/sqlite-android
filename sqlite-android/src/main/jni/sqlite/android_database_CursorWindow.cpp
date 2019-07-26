@@ -39,11 +39,15 @@ static struct {
 static jstring gEmptyString = NULL;
 
 static void throwExceptionWithRowCol(JNIEnv* env, jint row, jint column) {
-    jniThrowException(env, "java/lang/IllegalStateException", "Couldn't read row");
+    char buf[64];
+    snprintf(buf, sizeof(buf), "Couldn't read row %d column %d", row, column);
+    jniThrowException(env, "java/lang/IllegalStateException", buf);
 }
 
 static void throwUnknownTypeException(JNIEnv * env, jint type) {
-    jniThrowException(env, "java/lang/IllegalStateException", "UNKNOWN type");
+    char buf[32];
+    snprintf(buf, sizeof(buf), "UNKNOWN type %d", type);
+    jniThrowException(env, "java/lang/IllegalStateException", buf);
 }
 
 static jlong nativeCreate(JNIEnv* env, jclass clazz, jstring nameObj, jint cursorWindowSize) {
