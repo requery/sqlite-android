@@ -64,7 +64,7 @@ class SQLiteStatementType {
         if (sql.length() < 3) {
             return STATEMENT_OTHER;
         }
-        String prefixSql = sql.substring(0, 3).toUpperCase(Locale.US);
+        String prefixSql = sql.substring(0, 3);
 
         if (prefixSql.equalsIgnoreCase("SEL")) {
             return STATEMENT_SELECT;
