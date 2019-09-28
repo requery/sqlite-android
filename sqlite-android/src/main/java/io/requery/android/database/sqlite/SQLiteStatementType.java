@@ -64,34 +64,31 @@ class SQLiteStatementType {
         if (sql.length() < 3) {
             return STATEMENT_OTHER;
         }
-        String prefixSql = sql.substring(0, 3).toUpperCase(Locale.US);
-        switch (prefixSql) {
-            case "SEL":
-                return STATEMENT_SELECT;
-            case "INS":
-            case "UPD":
-            case "REP":
-            case "DEL":
-                return STATEMENT_UPDATE;
-            case "ATT":
-                return STATEMENT_ATTACH;
-            case "COM":
-                return STATEMENT_COMMIT;
-            case "END":
-                return STATEMENT_COMMIT;
-            case "ROL":
-                return STATEMENT_ABORT;
-            case "BEG":
-                return STATEMENT_BEGIN;
-            case "PRA":
-                return STATEMENT_PRAGMA;
-            case "CRE":
-            case "DRO":
-            case "ALT":
-                return STATEMENT_DDL;
-            case "ANA":
-            case "DET":
-                return STATEMENT_UNPREPARED;
+        String prefixSql = sql.substring(0, 3).toUpperCase(Locale.ROOT);
+        if (prefixSql.equals("SEL")) {
+            return STATEMENT_SELECT;
+        } else if (prefixSql.equals("INS") ||
+                prefixSql.equals("UPD") ||
+                prefixSql.equals("REP") ||
+                prefixSql.equals("DEL")) {
+            return STATEMENT_UPDATE;
+        } else if (prefixSql.equals("ATT")) {
+            return STATEMENT_ATTACH;
+        } else if (prefixSql.equals("COM")) {
+            return STATEMENT_COMMIT;
+        } else if (prefixSql.equals("END")) {
+            return STATEMENT_COMMIT;
+        } else if (prefixSql.equals("ROL")) {
+            return STATEMENT_ABORT;
+        } else if (prefixSql.equals("BEG")) {
+            return STATEMENT_BEGIN;
+        } else if (prefixSql.equals("PRA")) {
+            return STATEMENT_PRAGMA;
+        } else if (prefixSql.equals("CRE") || prefixSql.equals("DRO") ||
+                prefixSql.equals("ALT")) {
+            return STATEMENT_DDL;
+        } else if (prefixSql.equals("ANA") || prefixSql.equals("DET")) {
+            return STATEMENT_UNPREPARED;
         }
         return STATEMENT_OTHER;
     }
