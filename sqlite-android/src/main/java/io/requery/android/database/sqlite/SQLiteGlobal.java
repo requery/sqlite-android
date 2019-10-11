@@ -97,20 +97,20 @@ public final class SQLiteGlobal {
      * Gets the database synchronization mode when in WAL mode.
      */
     public static String getWALSyncMode() {
-        return "FULL";
+        return "normal";
     }
 
     /**
      * Gets the WAL auto-checkpoint integer in database pages.
      */
     public static int getWALAutoCheckpoint() {
-        return 100;
+        return 1000;
     }
 
     /**
      * Gets the connection pool size when in WAL mode.
      */
     public static int getWALConnectionPoolSize() {
-        return 4;
+        return 10;
     }
 }

@@ -64,35 +64,43 @@ class SQLiteStatementType {
         if (sql.length() < 3) {
             return STATEMENT_OTHER;
         }
-        String prefixSql = sql.substring(0, 3).toUpperCase(Locale.US);
-        switch (prefixSql) {
-            case "SEL":
-                return STATEMENT_SELECT;
-            case "INS":
-            case "UPD":
-            case "REP":
-            case "DEL":
-                return STATEMENT_UPDATE;
-            case "ATT":
-                return STATEMENT_ATTACH;
-            case "COM":
-                return STATEMENT_COMMIT;
-            case "END":
-                return STATEMENT_COMMIT;
-            case "ROL":
-                return STATEMENT_ABORT;
-            case "BEG":
-                return STATEMENT_BEGIN;
-            case "PRA":
-                return STATEMENT_PRAGMA;
-            case "CRE":
-            case "DRO":
-            case "ALT":
-                return STATEMENT_DDL;
-            case "ANA":
-            case "DET":
-                return STATEMENT_UNPREPARED;
+        String prefixSql = sql.substring(0, 3);
+
+        if (prefixSql.equalsIgnoreCase("SEL")) {
+            return STATEMENT_SELECT;
         }
+        if (prefixSql.equalsIgnoreCase("INS")
+                || prefixSql.equalsIgnoreCase("UPD")
+                || prefixSql.equalsIgnoreCase("REP")
+                || prefixSql.equalsIgnoreCase("DEL")) {
+            return STATEMENT_UPDATE;
+        }
+        if (prefixSql.equalsIgnoreCase("ATT")) {
+            return STATEMENT_ATTACH;
+        }
+        if (prefixSql.equalsIgnoreCase("COM")
+                || prefixSql.equalsIgnoreCase("END")) {
+            return STATEMENT_COMMIT;
+        }
+        if (prefixSql.equalsIgnoreCase("ROL")) {
+            return STATEMENT_ABORT;
+        }
+        if (prefixSql.equalsIgnoreCase("BEG")) {
+            return STATEMENT_BEGIN;
+        }
+        if (prefixSql.equalsIgnoreCase("PRA")) {
+            return STATEMENT_PRAGMA;
+        }
+        if (prefixSql.equalsIgnoreCase("CRE")
+                || prefixSql.equalsIgnoreCase("DRO")
+                || prefixSql.equalsIgnoreCase("ALT")) {
+            return STATEMENT_DDL;
+        }
+
+        if (prefixSql.equalsIgnoreCase("ANA") || prefixSql.equalsIgnoreCase("DET")) {
+            return STATEMENT_UNPREPARED;
+        }
+
         return STATEMENT_OTHER;
     }
 }
