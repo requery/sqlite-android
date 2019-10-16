@@ -66,7 +66,8 @@ class SQLiteStatementType {
         }
         String prefixSql = sql.substring(0, 3);
 
-        if (prefixSql.equalsIgnoreCase("SEL")) {
+        if (prefixSql.equalsIgnoreCase("SEL")
+                || prefixSql.equalsIgnoreCase("WIT")) {
             return STATEMENT_SELECT;
         }
         if (prefixSql.equalsIgnoreCase("INS")
