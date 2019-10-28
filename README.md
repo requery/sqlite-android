@@ -45,7 +45,7 @@ Usage
 
 ```gradle
 dependencies {
-    implementation 'io.requery:sqlite-android:3.29.0'
+    implementation 'io.requery:sqlite-android:3.30.1'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
