@@ -8,7 +8,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'de.undercouch.download'
 
 group = 'io.requery'
-version = '3.29.0'
+version = '3.30.1'
 description = 'Android SQLite compatibility library'
 
 android {
@@ -60,7 +60,7 @@ publish.dependsOn "assembleRelease"
 bintrayUpload.dependsOn "assembleRelease"
 
 ext {
-    sqliteDistributionUrl = 'https://sqlite.org/2019/sqlite-amalgamation-3290000.zip'
+    sqliteDistributionUrl = 'https://sqlite.org/2019/sqlite-amalgamation-3300100.zip'
     pomXml = {
         resolveStrategy = DELEGATE_FIRST
         name project.name
