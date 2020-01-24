@@ -26,6 +26,7 @@ Use new SQLite features:
 - **[Common Table expressions](https://www.sqlite.org/lang_with.html)**
 - **[Indexes on expressions](https://www.sqlite.org/expridx.html)**
 - **[Full Text Search 5](https://www.sqlite.org/fts5.html)**
+- **[Generated Columns](https://www.sqlite.org/gencol.html)**
 
 Performance
 -----------
