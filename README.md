@@ -25,6 +25,7 @@ Use new SQLite features:
 - **[JSON1 extension](https://www.sqlite.org/json1.html)**
 - **[Common Table expressions](https://www.sqlite.org/lang_with.html)**
 - **[Indexes on expressions](https://www.sqlite.org/expridx.html)**
+- **[Full Text Search 5](https://www.sqlite.org/fts5.html)**
 
 Performance
 -----------
@@ -45,7 +46,7 @@ Usage
 
 ```gradle
 dependencies {
-    implementation 'io.requery:sqlite-android:3.30.1'
+    implementation 'io.requery:sqlite-android:3.31.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
