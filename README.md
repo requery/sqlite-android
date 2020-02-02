@@ -25,6 +25,8 @@ Use new SQLite features:
 - **[JSON1 extension](https://www.sqlite.org/json1.html)**
 - **[Common Table expressions](https://www.sqlite.org/lang_with.html)**
 - **[Indexes on expressions](https://www.sqlite.org/expridx.html)**
+- **[Full Text Search 5](https://www.sqlite.org/fts5.html)**
+- **[Generated Columns](https://www.sqlite.org/gencol.html)**
 
 Performance
 -----------
@@ -45,7 +47,7 @@ Usage
 
 ```gradle
 dependencies {
-    implementation 'io.requery:sqlite-android:3.30.1'
+    implementation 'io.requery:sqlite-android:3.31.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -74,10 +76,10 @@ CPU Architectures
 
 The native library is built for the following CPU architectures:
 
-- `armeabi-v7a`
-- `arm64-v8a`
-- `x86`
-- `x86_64`
+- `armeabi-v7a` ~1.4 MB
+- `arm64-v8a` ~2 MB
+- `x86` ~2.1 MB
+- `x86_64` ~2.1 MB
 
 However you may not want to include all binaries in your apk. You can exclude certain variants by
 using `packagingOptions`:
@@ -93,7 +95,7 @@ android {
 }
 ```
 
-The size of the artifacts with only the armeabi-v7a binary is **~600kb**. In general you can use
+The size of the artifacts with only the armeabi-v7a binary is **~1.4 MB**. In general you can use
 armeabi-v7a on the majority of Android devices including Intel Atom which provides a native
 translation layer, however performance under the translation layer is worse than using the x86
 binary.
