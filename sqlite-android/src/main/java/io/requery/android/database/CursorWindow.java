@@ -500,4 +500,8 @@ public class CursorWindow extends SQLiteClosable {
     public String toString() {
         return getName() + " {" + Long.toHexString(mWindowPtr) + "}";
     }
+
+    public int getWindowSizeBytes() {
+        return mWindowSizeBytes;
+    }
 }
