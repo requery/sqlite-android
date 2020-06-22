@@ -26,6 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -43,6 +44,7 @@ public class CursorWindowTest {
         CursorWindow window = new CursorWindow("MyWindow");
         assertEquals("MyWindow", window.getName());
         assertEquals(0, window.getStartPosition());
+        assertEquals(2048 * 1024, window.getWindowSizeBytes());
         window.close();
     }
 
@@ -52,6 +54,7 @@ public class CursorWindowTest {
         CursorWindow window = new CursorWindow("");
         assertEquals("<unnamed>", window.getName());
         assertEquals(0, window.getStartPosition());
+        assertEquals(2048 * 1024, window.getWindowSizeBytes());
         window.close();
     }
 
@@ -61,6 +64,7 @@ public class CursorWindowTest {
         CursorWindow window = new CursorWindow(null);
         assertEquals("<unnamed>", window.getName());
         assertEquals(0, window.getStartPosition());
+        assertEquals(2048 * 1024, window.getWindowSizeBytes());
         window.close();
     }
 
@@ -103,5 +107,22 @@ public class CursorWindowTest {
         Arrays.fill(blob, value);
         assertTrue(window.putBlob(blob, 0, 6));
         assertTrue(Arrays.equals(blob, window.getBlob(0, 6)));
+    }
+
+
+
+    @SmallTest
+    @Test
+    public void testConstructorDifferentSize() {
+        CursorWindow window = new CursorWindow("big", 8);
+        assertEquals("big", window.getName());
+        assertEquals(0, window.getStartPosition());
+        assertEquals(8, window.getWindowSizeBytes());
+        try {
+            doTestValues(window);
+            fail("For window of size 8, the test should fail.");
+        } catch (Exception e) {
+        }
+        window.close();
     }
 }

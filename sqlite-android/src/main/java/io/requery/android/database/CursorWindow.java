@@ -33,8 +33,9 @@ public class CursorWindow extends SQLiteClosable {
     /** The cursor window size. resource xml file specifies the value in kB.
      * convert it to bytes here by multiplying with 1024.
      */
-    private static final int sCursorWindowSize =
+    private static final int sDefaultCursorWindowSize =
         WINDOW_SIZE_KB * 1024;
+    private final int mWindowSizeBytes;
 
     /**
      * The native CursorWindow object pointer.  (FOR INTERNAL USE ONLY)
@@ -69,6 +70,14 @@ public class CursorWindow extends SQLiteClosable {
     private static native String nativeGetName(long windowPtr);
 
     /**
+     * Creates a new empty cursor with default cursor size (currently 2MB)
+     */
+    public CursorWindow(String name) {
+        this(name, sDefaultCursorWindowSize);
+    }
+
+
+    /**
      * Creates a new empty cursor window and gives it a name.
      * <p>
      * The cursor initially has no rows or columns.  Call {@link #setNumColumns(int)} to
@@ -76,14 +85,29 @@ public class CursorWindow extends SQLiteClosable {
      * </p>
      *
      * @param name The name of the cursor window, or null if none.
+     * @param windowSizeBytes Size of cursor window in bytes.
+     *
+     * Note: Memory is dynamically allocated as data rows are added to
+     * the window. Depending on the amount of data stored, the actual
+     * amount of memory allocated can be lower than specified size,
+     * but cannot exceed it. Value is a non-negative number of bytes.
      */
-    public CursorWindow(String name) {
+    public CursorWindow(String name, int windowSizeBytes) {
+        /* In
+         https://developer.android.com/reference/android/database/CursorWindow#CursorWindow(java.lang.String,%20long)
+         windowSizeBytes is long. However windowSizeBytes is
+         eventually transformed into a size_t in cpp, and I can not
+         guarantee that long->size_t would be possible. I thus keep
+         int. This means that we can create cursor of size up to 4GiB
+         while upstream can theoretically create cursor of size up to
+         16 EiB. It is probably an acceptable restriction.*/
         mStartPos = 0;
+        mWindowSizeBytes = windowSizeBytes;
         mName = name != null && name.length() != 0 ? name : "<unnamed>";
-        mWindowPtr = nativeCreate(mName, sCursorWindowSize);
+        mWindowPtr = nativeCreate(mName, windowSizeBytes);
         if (mWindowPtr == 0) {
             throw new CursorWindowAllocationException("Cursor window allocation of " +
-                    (sCursorWindowSize / 1024) + " kb failed. ");
+                    (windowSizeBytes / 1024) + " kb failed. ");
         }
     }
 
@@ -475,5 +499,9 @@ public class CursorWindow extends SQLiteClosable {
     @Override
     public String toString() {
         return getName() + " {" + Long.toHexString(mWindowPtr) + "}";
+    }
+
+    public int getWindowSizeBytes() {
+        return mWindowSizeBytes;
     }
 }
