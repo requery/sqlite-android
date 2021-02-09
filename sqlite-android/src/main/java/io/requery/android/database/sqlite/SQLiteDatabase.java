@@ -1384,7 +1384,11 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
             public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery,
                                     String editTable, SQLiteQuery query) {
                 supportQuery.bindTo(query);
-                return new SQLiteCursor(masterQuery, editTable, query);
+                if (mCursorFactory == null) {
+                    return new SQLiteCursor(masterQuery, editTable, query);
+                } else {
+                    return mCursorFactory.newCursor(db, masterQuery, editTable, query);
+                }
             }
         }, supportQuery.getSql(), new String[0], null, signal);
     }
