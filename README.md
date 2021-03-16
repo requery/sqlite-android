@@ -27,6 +27,7 @@ Use new SQLite features:
 - **[Indexes on expressions](https://www.sqlite.org/expridx.html)**
 - **[Full Text Search 5](https://www.sqlite.org/fts5.html)**
 - **[Generated Columns](https://www.sqlite.org/gencol.html)**
+- **[DROP COLUMN support](https://www.sqlite.org/lang_altertable.html#altertabdropcol)**
 
 Performance
 -----------
@@ -47,7 +48,7 @@ Usage
 
 ```gradle
 dependencies {
-    implementation 'io.requery:sqlite-android:3.34.1'
+    implementation 'io.requery:sqlite-android:3.35.1'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
