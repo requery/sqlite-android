@@ -13,7 +13,7 @@ description = 'Android SQLite compatibility library'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
-    ndkVersion '21.4.7075529'
+    ndkVersion '21.1.6352462'
 
     defaultConfig {
         minSdkVersion 14
@@ -107,19 +107,28 @@ if (localProperties.exists()) {
 }
 
 task sourceJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from android.sourceSets.main.java.srcDirs
 }
 
 task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += configurations.compile
+    android.libraryVariants.all { variant ->
+        if (variant.name == 'release') {
+            owner.classpath += variant.javaCompileProvider.get().classpath
+        }
+    }
+    exclude '**/R.html', '**/R.*.html', '**/index.html'
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+
     failOnError false
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
@@ -132,25 +141,25 @@ publishing {
             artifact "build/outputs/aar/${project.name}-release.aar"
             artifact sourceJar
             artifact javadocJar
-            pom {
-                name = project.name
-                description = project.description
-                url = 'https://github.com/requery/sqlite-android'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/requery/sqlite-android.git'
-                    url = 'https://github.com/requery/sqlite-android'
-                }
-            }
+//            pom {
+//                name = project.name
+//                description = project.description
+//                url = 'https://github.com/requery/sqlite-android'
+//                licenses {
+//                    license {
+//                        name = 'The Apache License, Version 2.0'
+//                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                    }
+//                }
+//                scm {
+//                    connection = 'scm:git:git://github.com/requery/sqlite-android.git'
+//                    url = 'https://github.com/requery/sqlite-android'
+//                }
+//            }
             pom.withXml {
                 asNode().children().last() + project.pomXml
                 def dependencies = asNode().appendNode('dependencies')
-                configurations.compile.allDependencies.each {
+                configurations.compile.allDependencies.all {
                     def dependency = dependencies.appendNode('dependency')
                     dependency.appendNode('groupId', it.group)
                     dependency.appendNode('artifactId', it.name)
@@ -160,15 +169,15 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-            credentials {
-                username properties.getProperty('sonatype.username')
-                password properties.getProperty('sonatype.password')
-            }
-        }
-    }
+//    repositories {
+//        maven {
+//            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+//            credentials {
+//                username properties.getProperty('sonatype.username')
+//                password properties.getProperty('sonatype.password')
+//            }
+//        }
+//    }
 }
 
 publish.dependsOn "assembleRelease"
