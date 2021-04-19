@@ -8,13 +8,13 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'de.undercouch.download'
 
 group = 'io.requery'
-version = '3.34.1'
+version = '3.35.4'
 description = 'Android SQLite compatibility library'
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
-    ndkVersion '21.0.6113669'
+    ndkVersion '21.4.7075529'
 
     defaultConfig {
         minSdkVersion 14
@@ -59,7 +59,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = 'https://sqlite.org/2021/sqlite-amalgamation-3350100.zip'
+    sqliteDistributionUrl = 'https://sqlite.org/2021/sqlite-amalgamation-3350400.zip'
     pomXml = {
         resolveStrategy = DELEGATE_FIRST
         name project.name
