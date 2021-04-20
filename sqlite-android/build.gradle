@@ -76,12 +76,6 @@ ext {
                 distribution 'repo'
             }
         }
-        developers {
-            developer {
-                id 'npurushe'
-                name 'Nikhil Purushe'
-            }
-        }
     }
 }
 
@@ -141,21 +135,6 @@ publishing {
             artifact "build/outputs/aar/${project.name}-release.aar"
             artifact sourceJar
             artifact javadocJar
-//            pom {
-//                name = project.name
-//                description = project.description
-//                url = 'https://github.com/requery/sqlite-android'
-//                licenses {
-//                    license {
-//                        name = 'The Apache License, Version 2.0'
-//                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                    }
-//                }
-//                scm {
-//                    connection = 'scm:git:git://github.com/requery/sqlite-android.git'
-//                    url = 'https://github.com/requery/sqlite-android'
-//                }
-//            }
             pom.withXml {
                 asNode().children().last() + project.pomXml
                 def dependencies = asNode().appendNode('dependencies')
@@ -169,15 +148,6 @@ publishing {
             }
         }
     }
-//    repositories {
-//        maven {
-//            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-//            credentials {
-//                username properties.getProperty('sonatype.username')
-//                password properties.getProperty('sonatype.password')
-//            }
-//        }
-//    }
 }
 
 publish.dependsOn "assembleRelease"
