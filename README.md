@@ -46,9 +46,24 @@ versions.
 Usage
 -----
 
+Follow the guidelines from [jitpack.io](https://jitpack.io) to add the JitPack repository to your build file if you have not.
+
+Typically, this means an edit to your `build.gradle` file to add a new `repository` definition in the `allprojects` block, like this:
+
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+Then add the sqlite-android artifact from this repository as a dependency:
+
 ```gradle
 dependencies {
-    implementation 'io.requery:sqlite-android:3.35.4'
+    implementation 'com.github.requery:sqlite-android:3.35.4'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
