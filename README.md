@@ -1,6 +1,7 @@
 # Android SQLite support library
 
 [![Build Status](https://travis-ci.org/requery/sqlite-android.svg?branch=master)](https://travis-ci.org/requery/sqlite-android)
+[![Download](https://jitpack.io/v/requery/sqlite-android.svg)](https://jitpack.io/#requery/sqlite-android)
 
 This is an Android specific distribution of the latest versions of SQLite. It contains the latest
 SQLite version and the Android specific database APIs derived from AOSP packaged as an AAR
