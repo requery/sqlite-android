@@ -1,7 +1,7 @@
 # Android SQLite support library
 
 [![Build Status](https://travis-ci.org/requery/sqlite-android.svg?branch=master)](https://travis-ci.org/requery/sqlite-android)
-[ ![Download](https://api.bintray.com/packages/requery/requery/sqlite-android/images/download.svg) ](https://bintray.com/requery/requery/sqlite-android/_latestVersion)
+[![Download](https://jitpack.io/v/requery/sqlite-android.svg)](https://jitpack.io/#requery/sqlite-android)
 
 This is an Android specific distribution of the latest versions of SQLite. It contains the latest
 SQLite version and the Android specific database APIs derived from AOSP packaged as an AAR
@@ -63,7 +63,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.35.4'
+    implementation 'com.github.requery:sqlite-android:3.35.5'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -154,7 +154,7 @@ Changes
 - Migrate to gradle build
 - buildscript dynamically fetches and builds the latest sqlite source from sqlite.org
 - Added consumer proguard rules
-- Use support-v4 version of `CancellationSignal`
+- Use androidx-core version of `CancellationSignal`
 - Fix bug in `SQLiteOpenHelper.getDatabaseLocked()` wrong path to `openOrCreateDatabase`
 - Fix removed members in AbstractWindowCursor
 - Made the AOSP code (mostly) warning free but still mergable from source
@@ -164,7 +164,7 @@ Changes
 License
 -------
 
-    Copyright (C) 2017 requery.io
+    Copyright (C) 2017-2021 requery.io
     Copyright (C) 2005-2012 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");
