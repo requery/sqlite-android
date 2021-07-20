@@ -29,20 +29,6 @@ Use new SQLite features:
 - **[Generated Columns](https://www.sqlite.org/gencol.html)**
 - **[DROP COLUMN support](https://www.sqlite.org/lang_altertable.html#altertabdropcol)**
 
-Performance
------------
-
-![chart](http://requery.github.io/sqlite-android/performance.png)
-
-This library contains an optimized version of the Android database wrapper API native code that
-along with newer optimized sqlite versions provide better performance than the current Android
-database API in generally all cases.
-
-On mid range devices running Android KitKat this library can be up to 40% faster on read operations.
-Performance varies greatly between different devices and OS versions. On newer OS versions &
-devices the performance improvement is generally smaller as those versions contain newer SQLite
-versions.
-
 Usage
 -----
 
