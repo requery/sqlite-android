@@ -49,7 +49,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.36.0'
+    implementation 'com.github.requery:sqlite-android:3.37.2'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
