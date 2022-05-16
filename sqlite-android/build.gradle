@@ -13,7 +13,7 @@ description = 'Android SQLite compatibility library'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
-    ndkVersion '21.1.6352462'
+    ndkVersion '22.1.7171670'
 
     defaultConfig {
         minSdkVersion 14
