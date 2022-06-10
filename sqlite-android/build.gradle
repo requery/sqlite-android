@@ -13,7 +13,7 @@ description = 'Android SQLite compatibility library'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
-    ndkVersion '22.1.7171670'
+    ndkVersion '24.0.8215888'
 
     defaultConfig {
         minSdkVersion 14
@@ -132,9 +132,11 @@ publishing {
             groupId project.group
             artifactId project.name
             version project.version
-            artifact "build/outputs/aar/${project.name}-release.aar"
-            artifact sourceJar
-            artifact javadocJar
+            afterEvaluate {
+                artifact bundleReleaseAar
+                artifact sourceJar
+                artifact javadocJar
+            }
             pom.withXml {
                 asNode().children().last() + project.pomXml
                 def dependencies = asNode().appendNode('dependencies')
@@ -149,5 +151,3 @@ publishing {
         }
     }
 }
-
-publish.dependsOn "assembleRelease"
