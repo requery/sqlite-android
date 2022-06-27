@@ -7,7 +7,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'de.undercouch.download'
 
 group = 'io.requery'
-version = '3.38.4'
+version = '3.38.5'
 description = 'Android SQLite compatibility library'
 
 android {
@@ -58,7 +58,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3380400.zip'
+    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3380500.zip'
     pomXml = {
         resolveStrategy = DELEGATE_FIRST
         name project.name
