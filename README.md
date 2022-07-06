@@ -5,7 +5,7 @@
 
 This is an Android specific distribution of the latest versions of SQLite. It contains the latest
 SQLite version and the Android specific database APIs derived from AOSP packaged as an AAR
-library distributed on jcenter.
+library distributed on jitpack.
 
 Why?
 ----
@@ -49,7 +49,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.38.5'
+    implementation 'com.github.requery:sqlite-android:3.39.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -150,7 +150,7 @@ Changes
 License
 -------
 
-    Copyright (C) 2017-2021 requery.io
+    Copyright (C) 2017-2022 requery.io
     Copyright (C) 2005-2012 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");

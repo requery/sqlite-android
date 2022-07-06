@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.requery'
-version = '3.38.5'
+version = '3.39.0'
 description = 'Android SQLite compatibility library'
 
 android {
@@ -57,7 +57,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3380500.zip'
+    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3390000.zip'
     pomXml = {
         resolveStrategy = DELEGATE_FIRST
         name project.name
