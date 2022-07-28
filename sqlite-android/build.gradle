@@ -107,6 +107,15 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+preBuild.dependsOn installSqlite
+// https://issuetracker.google.com/issues/207403732
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith("configureNdkBuildDebug")
+            || task.name.startsWith("configureNdkBuildRelease")) {
+        task.dependsOn preBuild
+    }
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -137,10 +146,4 @@ publishing {
             }
         }
     }
-}
-
-afterEvaluate {
-    // https://issuetracker.google.com/issues/207403732
-    configureNdkBuildDebug.dependsOn(preBuild)
-    configureNdkBuildRelease.dependsOn(preBuild)
 }
