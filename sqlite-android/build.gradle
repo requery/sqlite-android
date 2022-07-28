@@ -5,13 +5,13 @@ plugins {
 }
 
 group = 'io.requery'
-version = '3.39.0'
+version = '3.39.2'
 description = 'Android SQLite compatibility library'
 
 android {
     compileSdkVersion 32
-    buildToolsVersion "32.0.0"
-    ndkVersion '24.0.8215888'
+    buildToolsVersion "33.0.0"
+    ndkVersion '25.0.8775105'
 
     defaultConfig {
         minSdkVersion 14
@@ -57,7 +57,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3390000.zip'
+    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3390200.zip'
 }
 
 task downloadSqlite(type: Download) {
