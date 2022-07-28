@@ -58,24 +58,6 @@ dependencies {
 
 ext {
     sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3390000.zip'
-    pomXml = {
-        resolveStrategy = DELEGATE_FIRST
-        name project.name
-        description project.description
-        url 'https://github.com/requery/sqlite-android'
-        scm {
-            url 'https://github.com/requery/sqlite-android.git'
-            connection 'scm:git:git://github.com/requery/sqlite-android.git'
-            developerConnection 'scm:git:git@github.com/requery/sqlite-android.git'
-        }
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
-        }
-    }
 }
 
 task downloadSqlite(type: Download) {
@@ -131,22 +113,34 @@ publishing {
             groupId project.group
             artifactId project.name
             version project.version
+            pom {
+                name = project.name
+                description = project.description
+                url = 'https://github.com/requery/sqlite-android'
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/requery/sqlite-android.git'
+                    connection = 'scm:git:git://github.com/requery/sqlite-android.git'
+                    developerConnection = 'scm:git:git@github.com/requery/sqlite-android.git'
+                }
+            }
             afterEvaluate {
                 artifact bundleReleaseAar
                 artifact sourceJar
                 artifact javadocJar
             }
-            pom.withXml {
-                asNode().children().last() + project.pomXml
-                def dependencies = asNode().appendNode('dependencies')
-                configurations.compile.allDependencies.all {
-                    def dependency = dependencies.appendNode('dependency')
-                    dependency.appendNode('groupId', it.group)
-                    dependency.appendNode('artifactId', it.name)
-                    dependency.appendNode('version', it.version)
-                    dependency.appendNode('scope', 'compile')
-                }
-            }
         }
     }
+}
+
+afterEvaluate {
+    // https://issuetracker.google.com/issues/207403732
+    configureNdkBuildDebug.dependsOn(preBuild)
+    configureNdkBuildRelease.dependsOn(preBuild)
 }
