@@ -3,7 +3,7 @@ name: ci
 permissions:
   contents: read
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   ci:
