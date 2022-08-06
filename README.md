@@ -78,10 +78,10 @@ CPU Architectures
 
 The native library is built for the following CPU architectures:
 
-- `armeabi-v7a` ~1.4 MB
-- `arm64-v8a` ~2 MB
-- `x86` ~2.1 MB
-- `x86_64` ~2.1 MB
+- `armeabi-v7a` ~1.2 MB
+- `arm64-v8a` ~1.7 MB
+- `x86` ~1.7 MB
+- `x86_64` ~1.8 MB
 
 However you may not want to include all binaries in your apk. You can exclude certain variants by
 using `packagingOptions`:
@@ -97,7 +97,7 @@ android {
 }
 ```
 
-The size of the artifacts with only the armeabi-v7a binary is **~1.4 MB**. In general you can use
+The size of the artifacts with only the armeabi-v7a binary is **~1.2 MB**. In general you can use
 armeabi-v7a on the majority of Android devices including Intel Atom which provides a native
 translation layer, however performance under the translation layer is worse than using the x86
 binary.
@@ -146,6 +146,7 @@ Changes
 - Made the AOSP code (mostly) warning free but still mergable from source
 - Deprecated classes/methods removed
 - Loadable extension support
+- STL dependency removed
 
 License
 -------
