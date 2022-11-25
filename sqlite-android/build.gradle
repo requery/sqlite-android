@@ -1,12 +1,10 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id 'de.undercouch.download'
     id 'com.android.library'
-    id 'maven-publish'
+    id 'com.vanniktech.maven.publish' version '0.22.0'
 }
-
-group = 'io.requery'
-version = '3.39.2'
-description = 'Android SQLite compatibility library'
 
 android {
     compileSdkVersion 32
@@ -15,7 +13,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        versionName project.version
+        versionName VERSION_NAME
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'proguard-rules.pro'
         ndk {
@@ -40,10 +38,6 @@ android {
         ndkBuild {
             path 'src/main/jni/Android.mk'
         }
-    }
-
-    libraryVariants.all {
-        it.generateBuildConfigProvider.configure { enabled = false }
     }
 }
 
@@ -75,17 +69,6 @@ task installSqlite(dependsOn: downloadSqlite, type: Copy) {
 
 preBuild.dependsOn installSqlite
 
-Properties properties = new Properties()
-File localProperties = project.rootProject.file('local.properties')
-if (localProperties.exists()) {
-    properties.load(localProperties.newDataInputStream())
-}
-
-task sourceJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from android.sourceSets.main.java.srcDirs
-}
-
 task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
@@ -102,12 +85,6 @@ task javadoc(type: Javadoc) {
     failOnError false
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.set('javadoc')
-    from javadoc.destinationDir
-}
-
-preBuild.dependsOn installSqlite
 // https://issuetracker.google.com/issues/207403732
 tasks.whenTaskAdded { task ->
     if (task.name.startsWith("configureNdkBuildDebug")
@@ -116,34 +93,7 @@ tasks.whenTaskAdded { task ->
     }
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId project.group
-            artifactId project.name
-            version project.version
-            pom {
-                name = project.name
-                description = project.description
-                url = 'https://github.com/requery/sqlite-android'
-                licenses {
-                    license {
-                        name = 'The Apache Software License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution = 'repo'
-                    }
-                }
-                scm {
-                    url = 'https://github.com/requery/sqlite-android.git'
-                    connection = 'scm:git:git://github.com/requery/sqlite-android.git'
-                    developerConnection = 'scm:git:git@github.com/requery/sqlite-android.git'
-                }
-            }
-            afterEvaluate {
-                artifact bundleReleaseAar
-                artifact sourceJar
-                artifact javadocJar
-            }
-        }
-    }
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.DEFAULT, /* automaticRelease */ true)
+    signAllPublications()
 }
