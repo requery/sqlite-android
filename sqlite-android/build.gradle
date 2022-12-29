@@ -3,7 +3,7 @@ import com.vanniktech.maven.publish.SonatypeHost
 plugins {
     id 'de.undercouch.download'
     id 'com.android.library'
-    id 'com.vanniktech.maven.publish' version '0.22.0'
+    id 'com.vanniktech.maven.publish' version '0.23.0'
 }
 
 android {
@@ -52,7 +52,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3400000.zip'
+    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3400100.zip'
 }
 
 task downloadSqlite(type: Download) {
