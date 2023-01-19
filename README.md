@@ -49,7 +49,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.39.2'
+    implementation 'com.github.requery:sqlite-android:3.40.1'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -113,7 +113,7 @@ Versioning
 ----------
 
 The library is versioned after the version of SQLite it contains. For changes specific to just the
-wrapper API a revision number is added e.g. 3.12.0-X, where X is the revision number.
+wrapper API a revision number is added e.g. 3.40.1-X, where X is the revision number.
 
 Acknowledgements
 ----------------

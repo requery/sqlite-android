@@ -3,17 +3,18 @@ import com.vanniktech.maven.publish.SonatypeHost
 plugins {
     id 'de.undercouch.download'
     id 'com.android.library'
-    id 'com.vanniktech.maven.publish' version '0.22.0'
+    id 'com.vanniktech.maven.publish' version '0.23.0'
 }
 
 android {
-    compileSdkVersion 32
-    buildToolsVersion "33.0.0"
-    ndkVersion '25.0.8775105'
+    compileSdkVersion 33
+    buildToolsVersion "33.0.1"
+    ndkVersion '25.1.8937393'
 
     defaultConfig {
         minSdkVersion 14
         versionName VERSION_NAME
+        namespace "io.requery.android.sqlite"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'proguard-rules.pro'
         ndk {
@@ -43,15 +44,15 @@ android {
 
 dependencies {
     api 'androidx.sqlite:sqlite:2.2.0'
-    api 'androidx.core:core:1.8.0'
-    androidTestImplementation 'androidx.test:core:1.4.0'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test:rules:1.4.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    api 'androidx.core:core:1.9.0'
+    androidTestImplementation 'androidx.test:core:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.1'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
 }
 
 ext {
-    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3390200.zip'
+    sqliteDistributionUrl = 'https://www.sqlite.org/2022/sqlite-amalgamation-3400100.zip'
 }
 
 task downloadSqlite(type: Download) {
