@@ -17,7 +17,7 @@
 
 package io.requery.android.database.sqlite;
 
-import java.util.Locale;
+import androidx.annotation.VisibleForTesting;
 
 class SQLiteStatementType {
 
@@ -60,7 +60,8 @@ class SQLiteStatementType {
      * @return one of the values listed above
      */
     public static int getSqlStatementType(String sql) {
-        sql = sql.trim();
+        // Strip leading comments to properly recognize the statement type
+        sql = stripLeadingSqlComments(sql);
         if (sql.length() < 3) {
             return STATEMENT_OTHER;
         }
@@ -103,5 +104,46 @@ class SQLiteStatementType {
         }
 
         return STATEMENT_OTHER;
+    }
+
+    /**
+     * Removes only leading comments, i.e. before the first non-commented statement.
+     *
+     * @param sql sql statement to remove comments from
+     * @return trimmed sql statement with leading comments removed
+     */
+    @VisibleForTesting
+    static String stripLeadingSqlComments(String sql) {
+        sql = sql.trim();
+        boolean inSingleLineComment = false;
+        boolean inMultiLineComment = false;
+        int statementStartIndex = 0;
+
+        for (int i = 0; i < sql.length(); i++) {
+            char c = sql.charAt(i);
+
+            if (inSingleLineComment) {
+                if (c == '\n') {
+                    inSingleLineComment = false;
+                }
+            } else if (inMultiLineComment) {
+                if (c == '*' && i + 1 < sql.length() && sql.charAt(i + 1) == '/') {
+                    inMultiLineComment = false;
+                }
+            } else if (c == '-') {
+                if (i + 1 < sql.length() && sql.charAt(i + 1) == '-') {
+                    inSingleLineComment = true;
+                }
+            } else if (c == '/') {
+                if (i + 1 < sql.length() && sql.charAt(i + 1) == '*') {
+                    inMultiLineComment = true;
+                }
+            } else if (c != '\n' && c != '\r' && c != ' ' && c != '\t') {
+                statementStartIndex = i;
+                break;
+            }
+        }
+
+        return sql.substring(statementStartIndex);
     }
 }
