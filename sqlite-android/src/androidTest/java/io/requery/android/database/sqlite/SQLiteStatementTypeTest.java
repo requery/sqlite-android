@@ -1,5 +1,7 @@
 package io.requery.android.database.sqlite;
 
+import static io.requery.android.database.sqlite.SQLiteStatementTypeTest.TestData.test;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,98 +22,102 @@ public class SQLiteStatementTypeTest {
     }
 
     private static final TestData[] queriesTestData = {
-            new TestData("", ""),
-            new TestData(" ", ""),
-            new TestData("\n", ""),
-            new TestData(
+            test("", ""),
+            test(" ", ""),
+            test("\n", ""),
+            test(
                     "\n-- ?1 - version id, required\n-- ?2 - account id, optional\nSELECT\n  SUM(col1 + col2) AS count\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\nAND\n  CASE WHEN COALESCE(?2, '') = '' THEN 1 ELSE entityId = ?2 END\n",
                     "SELECT\n  SUM(col1 + col2) AS count\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\nAND\n  CASE WHEN COALESCE(?2, '') = '' THEN 1 ELSE entityId = ?2 END"
             ),
-            new TestData(
+            test(
                     "select * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "select * from employees -- this is a comment",
                     "select * from employees -- this is a comment"
             ),
-            new TestData(
+            test(
                     "select * from employees /* first comment */-- second comment",
                     "select * from employees /* first comment */-- second comment"
             ),
-            new TestData(
+            test(
                     "-- this is a comment\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "-- this is a comment\nselect \"--col\" from employees",
                     "select \"--col\" from employees"
             ),
-            new TestData(
+            test(
                     "-------this is a comment\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "\n-- ?1 first parameter id\n-- ?2 second parameter format \"yyyy-mm-01\"\n-- ?3 third parameter either 'value1' or 'value2'\n\nselect * from employees where param1 = ?1 AND param2 = ?2 AND param3 = ?3",
                     "select * from employees where param1 = ?1 AND param2 = ?2 AND param3 = ?3"
             ),
-            new TestData(
+            test(
                     "/* Single Line Block Comment */ select * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "/* Single Line Block Comment */\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "/* Multiline Line Block Comment\nHere is another line\nAnd another */\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "/*Multiline Line Block Comment\nHere is another line\nAnd another */\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "\nselect * from employees where /* this is param 1 */ param1 = ?1 AND /* this is param 2 */ param2 = ?2 AND /* this is param 3 */ param3 = ?3",
                     "select * from employees where /* this is param 1 */ param1 = ?1 AND /* this is param 2 */ param2 = ?2 AND /* this is param 3 */ param3 = ?3"
             ),
-            new TestData(
+            test(
                     "/* Single Line Block Comment */\n-- another comment\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "/* Single Line Block Comment */\n--another comment\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "/* Multiline Line Block Comment\nLine 2\nLine 3 */\n-- dashed comment\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "/* Multiline Line Block Comment\nLine 2\n-- dashed comment inside block comment\nLine 3 */\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "\nSELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\n    ",
                     "SELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0"
             ),
-            new TestData(
+            test(
                     "/* Multiline Line Block Comment\nLine 2\nLine 3 */-- single line comment\nselect * from employees",
                     "select * from employees"
             ),
-            new TestData(
+            test(
                     "/* Multiline Line Block Comment\nhttps://foo.bar.com/document/d/283472938749/foo.ts\nLine 3 */-- single line comment\nSELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\n    ",
                     "SELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0"
             )
     };
 
-    private static class TestData {
-        public final String inputQuery;
-        public final String expectedQuery;
+    static class TestData {
+        final String inputQuery;
+        final String expectedQuery;
 
-        public TestData(String inputQuery, String expectedQuery) {
+        TestData(String inputQuery, String expectedQuery) {
             this.inputQuery = inputQuery;
             this.expectedQuery = expectedQuery;
+        }
+
+        static TestData test(String inputQuery, String expectedQuery) {
+            return new TestData(inputQuery, expectedQuery);
         }
     }
 }
