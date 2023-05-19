@@ -32,9 +32,11 @@ Use new SQLite features:
 Usage
 -----
 
-Follow the guidelines from [jitpack.io](https://jitpack.io) to add the JitPack repository to your build file if you have not.
+Follow the guidelines from [jitpack.io](https://jitpack.io) to add the JitPack repository 
+to your build file if you have not.
 
-Typically, this means an edit to your `build.gradle` file to add a new `repository` definition in the `allprojects` block, like this:
+Typically, this means an edit to your `build.gradle` file to add a new `repository` definition 
+in the `allprojects` block, like this:
 
 ```gradle
 	allprojects {
@@ -49,7 +51,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.41.2'
+    implementation 'com.github.requery:sqlite-android:3.42.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -99,7 +101,7 @@ android {
 
 The size of the artifacts with only the armeabi-v7a binary is **~1.2 MB**.
 In general, you can use armeabi-v7a on the majority of Android devices including Intel Atom
-which provides a native translation layer, however performance under the translation layer
+which provides a native translation layer, however, performance under the translation layer
 is worse than using the x86 binary.
 
 Note that starting August 1, 2019, your apps published on Google Play will [need to support 64-bit architectures](https://developer.android.com/distribute/best-practices/develop/64-bit).
@@ -113,7 +115,7 @@ Versioning
 ----------
 
 The library is versioned after the version of SQLite it contains. For changes specific to just the
-wrapper API a revision number is added e.g. 3.41.2-X, where X is the revision number.
+wrapper API a revision number is added e.g. 3.42.0-X, where X is the revision number.
 
 Acknowledgements
 ----------------
