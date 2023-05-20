@@ -3,9 +3,9 @@
 ![Build Status](https://github.com/requery/sqlite-android/actions/workflows/ci.yml/badge.svg)
 [![Download](https://jitpack.io/v/requery/sqlite-android.svg)](https://jitpack.io/#requery/sqlite-android)
 
-This is an Android specific distribution of the latest versions of SQLite. It contains the latest
-SQLite version and the Android specific database APIs derived from AOSP packaged as an AAR
-library distributed on jitpack.
+This is an Android specific distribution of the latest versions of SQLite.
+It contains the latest SQLite version and the Android specific database APIs
+derived from AOSP packaged as an AAR library distributed on jitpack.
 
 Why?
 ----
@@ -15,9 +15,9 @@ Why?
 - **Up-to-date**
 
 Even the latest version of Android is several versions behind the latest version of SQLite.
-Theses versions do not have the bug fixes, performance improvements, or new features present in
+These versions do not have the bug fixes, performance improvements, or new features present in
 current versions of SQLite. This problem is worse the older the version of the OS the device has.
-Using this library you can keep up to date with the latest versions of SQLite and provide a
+Using this library, you can keep up to date with the latest versions of SQLite and provide a
 consistent version across OS versions and devices.
 
 Use new SQLite features:
@@ -32,9 +32,11 @@ Use new SQLite features:
 Usage
 -----
 
-Follow the guidelines from [jitpack.io](https://jitpack.io) to add the JitPack repository to your build file if you have not.
+Follow the guidelines from [jitpack.io](https://jitpack.io) to add the JitPack repository 
+to your build file if you have not.
 
-Typically, this means an edit to your `build.gradle` file to add a new `repository` definition in the `allprojects` block, like this:
+Typically, this means an edit to your `build.gradle` file to add a new `repository` definition 
+in the `allprojects` block, like this:
 
 ```gradle
 	allprojects {
@@ -49,7 +51,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.41.1'
+    implementation 'com.github.requery:sqlite-android:3.42.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -61,7 +63,7 @@ depended on `android.database.sqlite.SQLiteDatabase` equivalent APIs are provide
 
 If you expose `Cursor` instances across processes you should wrap the returned cursors in a
 [CrossProcessCursorWrapper](http://developer.android.com/reference/android/database/CrossProcessCursorWrapper.html)
-for performance reasons the cursors are not cross process by default.
+for performance reasons the cursors are not a cross process by default.
 
 ### Support library compatibility
 
@@ -83,8 +85,8 @@ The native library is built for the following CPU architectures:
 - `x86` ~1.7 MB
 - `x86_64` ~1.8 MB
 
-However you may not want to include all binaries in your apk. You can exclude certain variants by
-using `packagingOptions`:
+However, you may not want to include all binaries in your apk.
+You can exclude certain variants by using `packagingOptions`:
 
 ```gradle
 android {
@@ -97,36 +99,36 @@ android {
 }
 ```
 
-The size of the artifacts with only the armeabi-v7a binary is **~1.2 MB**. In general you can use
-armeabi-v7a on the majority of Android devices including Intel Atom which provides a native
-translation layer, however performance under the translation layer is worse than using the x86
-binary.
+The size of the artifacts with only the armeabi-v7a binary is **~1.2 MB**.
+In general, you can use armeabi-v7a on the majority of Android devices including Intel Atom
+which provides a native translation layer, however, performance under the translation layer
+is worse than using the x86 binary.
 
 Note that starting August 1, 2019, your apps published on Google Play will [need to support 64-bit architectures](https://developer.android.com/distribute/best-practices/develop/64-bit).
 
 Requirements
 ------------
 
-The min SDK level is API level 14 (Ice Cream Sandwich).
+The min SDK level is API level 19 (KitKat).
 
 Versioning
 ----------
 
 The library is versioned after the version of SQLite it contains. For changes specific to just the
-wrapper API a revision number is added e.g. 3.41.1-X, where X is the revision number.
+wrapper API a revision number is added e.g. 3.42.0-X, where X is the revision number.
 
 Acknowledgements
 ----------------
 This project is based on the AOSP code and the [Android SQLite bindings](https://www.sqlite.org/android/doc/trunk/www/index.wiki)
-No official distributions are made from the Android SQLite bindings it and it has not been updated
+No official distributions are made from the Android SQLite bindings it, and it has not been updated
 in a while, this project starts there and makes significant changes:
 
 Changes
 -------
 
-- **Fast read performance:** The original SQLite bindings filled the CursorWindow using it's
+- **Fast read performance:** The original SQLite bindings filled the CursorWindow using its
   Java methods from native C++. This was because there is no access to the native CursorWindow
-  native API from the NDK. Unfortunately this slowed read performance significantly (roughly 2x
+  native API from the NDK. Unfortunately, this slowed read performance significantly (roughly 2x
   worse vs the android database API) because of extra JNI roundtrips. This has been rewritten
   without the JNI to Java calls (so more like the original AOSP code) and also using a local memory
   CursorWindow.
