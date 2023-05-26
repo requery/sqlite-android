@@ -60,12 +60,12 @@ class SQLiteStatementType {
      * @return one of the values listed above
      */
     public static int getSqlStatementType(String sql) {
-        // Strip leading comments to properly recognize the statement type
-        sql = stripLeadingSqlComments(sql);
         if (sql.length() < 3) {
             return STATEMENT_OTHER;
         }
-        String prefixSql = sql.substring(0, 3);
+        // Skip leading comments to properly recognize the statement type
+        int statementStart = statementStartIndex(sql);
+        String prefixSql = sql.substring(statementStart, Math.min(statementStart + 3, sql.length()));
 
         if (prefixSql.equalsIgnoreCase("SEL")
                 || prefixSql.equalsIgnoreCase("WIT")) {
@@ -107,14 +107,11 @@ class SQLiteStatementType {
     }
 
     /**
-     * Removes only leading comments, i.e. before the first non-commented statement.
-     *
-     * @param sql sql statement to remove comments from
-     * @return trimmed sql statement with leading comments removed
+     * @param sql sql statement to check
+     * @return index of the SQL statement start, skipping leading comments
      */
     @VisibleForTesting
-    static String stripLeadingSqlComments(String sql) {
-        sql = sql.trim();
+    static int statementStartIndex(String sql) {
         boolean inSingleLineComment = false;
         boolean inMultiLineComment = false;
         int statementStartIndex = 0;
@@ -144,6 +141,6 @@ class SQLiteStatementType {
             }
         }
 
-        return sql.substring(statementStartIndex);
+        return statementStartIndex;
     }
 }
