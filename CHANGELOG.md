@@ -1,6 +1,9 @@
 Change Log
 ==========
 
+## 3.43.0
+- [SQLite 3.43.0](https://www.sqlite.org/releaselog/3_43_0.html)
+
 ## 3.42.0
 - [SQLite 3.42.0](https://www.sqlite.org/releaselog/3_42_0.html)
 - [SQLite 3.41.2](https://www.sqlite.org/releaselog/3_41_2.html)

@@ -3,14 +3,14 @@ import com.vanniktech.maven.publish.SonatypeHost
 plugins {
     id "de.undercouch.download"
     id "com.android.library"
-    id "com.vanniktech.maven.publish" version "0.25.2"
+    id "com.vanniktech.maven.publish" version "0.25.3"
 }
 
 android {
-    buildToolsVersion = "33.0.2"
+    buildToolsVersion = "34.0.0"
     ndkVersion "25.2.9519653"
 
-    compileSdk 33
+    compileSdk 34
 
     namespace "io.requery.android.sqlite"
 
@@ -36,8 +36,8 @@ android {
         abortOnError false
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     externalNativeBuild {
@@ -58,7 +58,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = "https://www.sqlite.org/2023/sqlite-amalgamation-3420000.zip"
+    sqliteDistributionUrl = "https://www.sqlite.org/2023/sqlite-amalgamation-3430000.zip"
 }
 
 tasks.register("downloadSqlite", Download) {
