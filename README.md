@@ -15,7 +15,7 @@ Why?
 - **Up-to-date**
 
 Even the latest version of Android is several versions behind the latest version of SQLite.
-These versions do not have the bug fixes, performance improvements, or new features present in
+These versions do not have bug fixes, performance improvements, or new features present in
 current versions of SQLite. This problem is worse the older the version of the OS the device has.
 Using this library, you can keep up to date with the latest versions of SQLite and provide a
 consistent version across OS versions and devices.
@@ -51,7 +51,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.42.0'
+    implementation 'com.github.requery:sqlite-android:3.43.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -115,7 +115,7 @@ Versioning
 ----------
 
 The library is versioned after the version of SQLite it contains. For changes specific to just the
-wrapper API a revision number is added e.g. 3.42.0-X, where X is the revision number.
+wrapper API, a revision number is added e.g. 3.43.0-X, where X is the revision number.
 
 Acknowledgements
 ----------------
