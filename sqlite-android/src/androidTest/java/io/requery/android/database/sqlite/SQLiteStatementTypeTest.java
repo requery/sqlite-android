@@ -14,20 +14,46 @@ public class SQLiteStatementTypeTest {
     }
 
     @Test
+    public void recognizesUntrimmedSelectQueryWithoutComments() {
+        String query = " \n SELECT * FROM table WHERE id = 1";
+        Assert.assertEquals(SQLiteStatementType.STATEMENT_SELECT, SQLiteStatementType.getSqlStatementType(query));
+    }
+
+    @Test
+    public void recognizesTrimmedSelectQueryWithoutComments() {
+        String query = "SELECT * FROM table WHERE id = 1";
+        Assert.assertEquals(SQLiteStatementType.STATEMENT_SELECT, SQLiteStatementType.getSqlStatementType(query));
+    }
+
+    @Test
+    public void recognizesUpdateQueryWithComments() {
+        String query = "--comment\nINSERT INTO phones (num) VALUES ('911');";
+        Assert.assertEquals(SQLiteStatementType.STATEMENT_UPDATE, SQLiteStatementType.getSqlStatementType(query));
+    }
+
+    @Test
+    public void notCrashingOnInvalidQuery() {
+        // Checking for index out of bounds, because `getSqlStatementType` uses (statementStartIndex + 3) as its end index
+        String query = "--comment\nSE";
+        Assert.assertEquals(SQLiteStatementType.STATEMENT_OTHER, SQLiteStatementType.getSqlStatementType(query));
+    }
+
+    @Test
     public void testStripSqlComments() {
         for (TestData test : queriesTestData) {
-            String strippedSql = SQLiteStatementType.stripLeadingSqlComments(test.inputQuery);
+            int start = SQLiteStatementType.statementStartIndex(test.inputQuery);
+            String strippedSql = test.inputQuery.substring(start);
             Assert.assertEquals("Error in test case\n" + test.inputQuery, test.expectedQuery, strippedSql);
         }
     }
 
     private static final TestData[] queriesTestData = {
             test("", ""),
-            test(" ", ""),
-            test("\n", ""),
+            test(" ", " "),
+            test("\n", "\n"),
             test(
                     "\n-- ?1 - version id, required\n-- ?2 - account id, optional\nSELECT\n  SUM(col1 + col2) AS count\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\nAND\n  CASE WHEN COALESCE(?2, '') = '' THEN 1 ELSE entityId = ?2 END\n",
-                    "SELECT\n  SUM(col1 + col2) AS count\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\nAND\n  CASE WHEN COALESCE(?2, '') = '' THEN 1 ELSE entityId = ?2 END"
+                    "SELECT\n  SUM(col1 + col2) AS count\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\nAND\n  CASE WHEN COALESCE(?2, '') = '' THEN 1 ELSE entityId = ?2 END\n"
             ),
             test(
                     "select * from employees",
@@ -95,7 +121,7 @@ public class SQLiteStatementTypeTest {
             ),
             test(
                     "\nSELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\n    ",
-                    "SELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0"
+                    "SELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\n    "
             ),
             test(
                     "/* Multiline Line Block Comment\nLine 2\nLine 3 */-- single line comment\nselect * from employees",
@@ -103,8 +129,13 @@ public class SQLiteStatementTypeTest {
             ),
             test(
                     "/* Multiline Line Block Comment\nhttps://foo.bar.com/document/d/283472938749/foo.ts\nLine 3 */-- single line comment\nSELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\n    ",
-                    "SELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0"
-            )
+                    "SELECT\n  'All Accounts' AS name,\n  'all-accounts' AS internal_name\nFROM\n  Accounts\nWHERE\n  id = ?1\nAND\n  col3 = 0\n    "
+            ),
+            // Shouldn't crash on invalid query
+            test(
+                    "/* Single Line Block Comment */SE",
+                    "SE"
+            ),
     };
 
     static class TestData {
