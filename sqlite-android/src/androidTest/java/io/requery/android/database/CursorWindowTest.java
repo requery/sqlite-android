@@ -112,17 +112,17 @@ public class CursorWindowTest {
 
 
     @SmallTest
-    @Test(expected = AssertionError.class)
+    @Test
     public void testConstructorDifferentSize() {
         CursorWindow window = new CursorWindow("big", 8);
         assertEquals("big", window.getName());
         assertEquals(0, window.getStartPosition());
         assertEquals(8, window.getWindowSizeBytes());
         try {
-            // For window of size 8, the test should fail
             doTestValues(window);
-        } finally {
-            window.close();
+            fail("For window of size 8, the test should fail.");
+        } catch (Exception e) {
         }
+        window.close();
     }
 }

@@ -20,7 +20,6 @@
 #include <jni.h>
 #include <sys/mman.h>
 #include <string.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
 
@@ -29,6 +28,8 @@
 #include "ALog-priv.h"
 #include "android_database_SQLiteCommon.h"
 #include "CursorWindow.h"
+
+#include <string>
 
 // Set to 1 to use UTF16 storage for localized indexes.
 #define UTF16_STORAGE 0
@@ -71,35 +72,27 @@ static struct {
 struct SQLiteConnection {
     sqlite3* const db;
     const int openFlags;
-    char* path;
-    char* label;
+    std::string path;
+    std::string label;
 
     volatile bool canceled;
 
-    SQLiteConnection(sqlite3* db, int openFlags, const char* path_, const char* label_) :
-        db(db), openFlags(openFlags), canceled(false) {
-        path = strdup(path_);
-        label = strdup(label_);
-    }
-
-    ~SQLiteConnection() {
-        free(path);
-        free(label);
-    }
+    SQLiteConnection(sqlite3* db, int openFlags, const std::string& path, const std::string& label) :
+        db(db), openFlags(openFlags), path(path), label(label), canceled(false) { }
 };
 
 // Called each time a statement begins execution, when tracing is enabled.
 static void sqliteTraceCallback(void *data, const char *sql) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
     ALOG(LOG_VERBOSE, SQLITE_TRACE_TAG, "%s: \"%s\"\n",
-            connection->label, sql);
+            connection->label.c_str(), sql);
 }
 
 // Called each time a statement finishes execution, when profiling is enabled.
 static void sqliteProfileCallback(void *data, const char *sql, sqlite3_uint64 tm) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
     ALOG(LOG_VERBOSE, SQLITE_PROFILE_TAG, "%s: \"%s\" took %0.3f ms\n",
-            connection->label, sql, tm * 0.000001f);
+            connection->label.c_str(), sql, tm * 0.000001f);
 }
 
 // Called after each SQLite VM instruction when cancelation is enabled.
@@ -137,20 +130,21 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
         jstring labelStr, jboolean enableTrace, jboolean enableProfile) {
 
     const char* pathChars = env->GetStringUTFChars(pathStr, NULL);
+    std::string path(pathChars);
+    env->ReleaseStringUTFChars(pathStr, pathChars);
+
     const char* labelChars = env->GetStringUTFChars(labelStr, NULL);
+    std::string label(labelChars);
+    env->ReleaseStringUTFChars(labelStr, labelChars);
 
     sqlite3* db;
-    int err = sqlite3_open_v2(pathChars, &db, openFlags, NULL);
+    int err = sqlite3_open_v2(path.c_str(), &db, openFlags, NULL);
     if (err != SQLITE_OK) {
-        env->ReleaseStringUTFChars(pathStr, pathChars);
-        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception_errcode(env, err, "Could not open database");
         return 0;
     }
     err = sqlite3_create_collation(db, "localized", SQLITE_UTF8, 0, coll_localized);
     if (err != SQLITE_OK) {
-        env->ReleaseStringUTFChars(pathStr, pathChars);
-        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception_errcode(env, err, "Could not register collation");
         sqlite3_close(db);
         return 0;
@@ -158,8 +152,6 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
 
     // Check that the database is really read/write when that is what we asked for.
     if ((openFlags & SQLITE_OPEN_READWRITE) && sqlite3_db_readonly(db, NULL)) {
-        env->ReleaseStringUTFChars(pathStr, pathChars);
-        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception(env, db, "Could not open the database in read/write mode.");
         sqlite3_close(db);
         return 0;
@@ -168,8 +160,6 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
     // Set the default busy handler to retry automatically before returning SQLITE_BUSY.
     err = sqlite3_busy_timeout(db, BUSY_TIMEOUT_MS);
     if (err != SQLITE_OK) {
-        env->ReleaseStringUTFChars(pathStr, pathChars);
-        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception(env, db, "Could not set busy timeout");
         sqlite3_close(db);
         return 0;
@@ -179,8 +169,6 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
 #if 0
     err = register_android_functions(db, UTF16_STORAGE);
     if (err) {
-        env->ReleaseStringUTFChars(pathStr, pathChars);
-        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception(env, db, "Could not register Android SQL functions.");
         sqlite3_close(db);
         return 0;
@@ -188,10 +176,7 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
 #endif
 
     // Create wrapper object.
-    SQLiteConnection* connection = new SQLiteConnection(db, openFlags, pathChars, labelChars);
-    ALOGV("Opened connection %p with label '%s'", db, labelChars);
-    env->ReleaseStringUTFChars(pathStr, pathChars);
-    env->ReleaseStringUTFChars(labelStr, labelChars);
+    SQLiteConnection* connection = new SQLiteConnection(db, openFlags, path, label);
 
     // Enable tracing and profiling if requested.
     if (enableTrace) {
@@ -201,6 +186,7 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
         sqlite3_profile(db, &sqliteProfileCallback, connection);
     }
 
+    ALOGV("Opened connection %p with label '%s'", db, label.c_str());
     return reinterpret_cast<jlong>(connection);
 }
 
