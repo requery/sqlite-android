@@ -17,7 +17,7 @@
 
 package io.requery.android.database.sqlite;
 
-import java.util.Locale;
+import androidx.annotation.VisibleForTesting;
 
 class SQLiteStatementType {
 
@@ -60,11 +60,12 @@ class SQLiteStatementType {
      * @return one of the values listed above
      */
     public static int getSqlStatementType(String sql) {
-        sql = sql.trim();
         if (sql.length() < 3) {
             return STATEMENT_OTHER;
         }
-        String prefixSql = sql.substring(0, 3);
+        // Skip leading comments to properly recognize the statement type
+        int statementStart = statementStartIndex(sql);
+        String prefixSql = sql.substring(statementStart, Math.min(statementStart + 3, sql.length()));
 
         if (prefixSql.equalsIgnoreCase("SEL")
                 || prefixSql.equalsIgnoreCase("WIT")) {
@@ -103,5 +104,43 @@ class SQLiteStatementType {
         }
 
         return STATEMENT_OTHER;
+    }
+
+    /**
+     * @param sql sql statement to check
+     * @return index of the SQL statement start, skipping leading comments
+     */
+    @VisibleForTesting
+    static int statementStartIndex(String sql) {
+        boolean inSingleLineComment = false;
+        boolean inMultiLineComment = false;
+        int statementStartIndex = 0;
+
+        for (int i = 0; i < sql.length(); i++) {
+            char c = sql.charAt(i);
+
+            if (inSingleLineComment) {
+                if (c == '\n') {
+                    inSingleLineComment = false;
+                }
+            } else if (inMultiLineComment) {
+                if (c == '*' && i + 1 < sql.length() && sql.charAt(i + 1) == '/') {
+                    inMultiLineComment = false;
+                }
+            } else if (c == '-') {
+                if (i + 1 < sql.length() && sql.charAt(i + 1) == '-') {
+                    inSingleLineComment = true;
+                }
+            } else if (c == '/') {
+                if (i + 1 < sql.length() && sql.charAt(i + 1) == '*') {
+                    inMultiLineComment = true;
+                }
+            } else if (c != '\n' && c != '\r' && c != ' ' && c != '\t') {
+                statementStartIndex = i;
+                break;
+            }
+        }
+
+        return statementStartIndex;
     }
 }
