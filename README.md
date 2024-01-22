@@ -25,7 +25,7 @@ Use new SQLite features:
 - **[JSON1 extension](https://www.sqlite.org/json1.html)**
 - **[Common Table expressions](https://www.sqlite.org/lang_with.html)**
 - **[Indexes on expressions](https://www.sqlite.org/expridx.html)**
-- **[Full Text Search 5](https://www.sqlite.org/fts5.html)**
+- **[Full-Text Search 5](https://www.sqlite.org/fts5.html)**
 - **[Generated Columns](https://www.sqlite.org/gencol.html)**
 - **[DROP COLUMN support](https://www.sqlite.org/lang_altertable.html#altertabdropcol)**
 
@@ -51,7 +51,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.43.0'
+    implementation 'com.github.requery:sqlite-android:3.45.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -115,7 +115,7 @@ Versioning
 ----------
 
 The library is versioned after the version of SQLite it contains. For changes specific to just the
-wrapper API, a revision number is added e.g. 3.43.0-X, where X is the revision number.
+wrapper API, a revision number is added e.g., 3.45.0-X, where X is the revision number.
 
 Acknowledgements
 ----------------
@@ -134,12 +134,12 @@ Changes
   CursorWindow.
 - Reuse of android.database.sqlite.*, the original SQLite bindings replicated the entire
   android.database.sqlite API structure including exceptions & interfaces. This project does not
-  do that, instead it reuses the original classes/interfaces when possible in order to simplify
+  do that, instead it reuses the original classes/interfaces when possible to simplify
   migration and/or use with existing code.
 - Unit tests added
 - Compile with [clang](http://clang.llvm.org/) toolchain
 - Compile with FTS3, FTS4, & JSON1 extension
-- Migrate to gradle build
+- Migrate to Gradle build
 - buildscript dynamically fetches and builds the latest sqlite source from sqlite.org
 - Added consumer proguard rules
 - Use androidx-core version of `CancellationSignal`
@@ -153,7 +153,7 @@ Changes
 License
 -------
 
-    Copyright (C) 2017-2023 requery.io
+    Copyright (C) 2017-2024 requery.io
     Copyright (C) 2005-2012 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");
