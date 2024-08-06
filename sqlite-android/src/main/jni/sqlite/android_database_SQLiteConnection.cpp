@@ -221,6 +221,42 @@ static void nativeClose(JNIEnv* env, jclass clazz, jlong connectionPtr) {
     }
 }
 
+static void sqliteUpdateHookCallback(void *pArg, int operationType, const char *databaseName, const char *tableName, sqlite3_int64 rowId) {
+    JNIEnv* env = 0;
+    gpJavaVM->GetEnv((void**)&env, JNI_VERSION_1_4);
+
+    jobject updateCallbackObjGlobal = reinterpret_cast<jobject>(pArg);
+    jobject updateCallbackObj = env->NewLocalRef(updateCallbackObjGlobal);
+
+    // TODO: Do something magical
+    // Get the Java class and method ID
+    jclass updateHookManagerClass = env->GetObjectClass(updateCallbackObj);
+    jmethodID onUpdateMethod = env->GetMethodID(updateHookManagerClass, "onUpdateFromNative", "(ILjava/lang/String;Ljava/lang/String;J)V");
+
+    if (onUpdateMethod != NULL) {
+        // Create Java strings from C strings
+        jstring dbName = env->NewStringUTF(databaseName);
+        jstring tblName = env->NewStringUTF(tableName);
+
+        // Call the Java method
+        env->CallVoidMethod(updateCallbackObj, onUpdateMethod, operationType, dbName, tblName, rowId);
+
+        // Clean up local references
+        env->DeleteLocalRef(dbName);
+        env->DeleteLocalRef(tblName);
+    } else {
+        ALOGE("Failed to find onUpdateFromNative method");
+    }
+
+    env->DeleteLocalRef(updateCallbackObj);
+
+    if (env->ExceptionCheck()) {
+        ALOGE("An exception was thrown by custom update callback.");
+        /* LOGE_EX(env); */
+        env->ExceptionClear();
+    }
+}
+
 // Called each time a custom function is evaluated.
 static void sqliteCustomFunctionCallback(sqlite3_context *context,
         int argc, sqlite3_value **argv) {
@@ -371,6 +407,20 @@ static void nativeRegisterFunction(JNIEnv *env, jclass clazz, jlong connectionPt
         throw_sqlite3_exception(env, connection->db);
         return;
     }
+}
+
+static void nativeRegisterUpdateHook(JNIEnv* env, jclass clazz, jlong connectionPtr,
+                                         jobject updateCallbackObj) {
+    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+
+    jobject updateCallbackObjGlobal = env->NewGlobalRef(updateCallbackObj);
+
+    if (updateCallbackObjGlobal == NULL) {
+        ALOGE("Failed to create global reference for callback object");
+        return;
+    }
+
+    sqlite3_update_hook(connection->db, sqliteUpdateHookCallback, reinterpret_cast<void*>(updateCallbackObjGlobal));
 }
 
 static void nativeRegisterLocalizedCollators(JNIEnv* env, jclass clazz, jlong connectionPtr,
@@ -988,6 +1038,8 @@ static JNINativeMethod sMethods[] =
             (void*)nativeHasCodec },
     { "nativeLoadExtension", "(JLjava/lang/String;Ljava/lang/String;)V",
             (void*)nativeLoadExtension },
+    { "nativeRegisterUpdateHook", "(JLio/requery/android/database/sqlite/SQLiteUpdateHook;)V",
+            (void*)nativeRegisterUpdateHook },
 };
 
 int register_android_database_SQLiteConnection(JNIEnv *env)

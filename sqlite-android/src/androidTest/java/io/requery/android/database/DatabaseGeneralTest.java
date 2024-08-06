@@ -39,6 +39,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -160,6 +164,34 @@ public class DatabaseGeneralTest {
         // always empty regardless of if sqlite3_result_null is called or not
         cursor.moveToFirst();
         assertSame(null, cursor.getString(0));
+    }
+
+    @MediumTest
+    @Test
+    public void testSetUpdateHook() {
+        // Initialize AtomicReferences with a default value
+        AtomicInteger calledOperation = new AtomicInteger();
+        AtomicReference<String> calledDatabaseName = new AtomicReference<>("");
+        AtomicReference<String> calledTableName = new AtomicReference<>("");
+        AtomicLong calledRowId = new AtomicLong();
+
+        // Set up the update hook
+        mDatabase.setUpdateHook((operationType, databaseName, tableName, rowId) -> {
+            calledOperation.set(operationType);
+            calledDatabaseName.set(databaseName);
+            calledTableName.set(tableName);
+            calledRowId.set(rowId);
+        });
+
+        // Execute SQL statements
+        mDatabase.execSQL("CREATE TABLE testUpdateHook (_id INTEGER PRIMARY KEY, data TEXT);");
+        mDatabase.execSQL("INSERT INTO testUpdateHook (data) VALUES ('newValue');");
+
+        // Verify that the update hook was called correctly
+        assertEquals(18, calledOperation.get());
+        assertEquals("main", calledDatabaseName.get());
+        assertEquals("testUpdateHook", calledTableName.get());
+        assertEquals(1, calledRowId.get());
     }
 
     @MediumTest
