@@ -7,7 +7,7 @@ on: [push, pull_request]
 
 jobs:
   ci:
-    runs-on: macos-11
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
