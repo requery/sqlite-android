@@ -30,7 +30,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           arch: x86
-          script: ./gradlew connectedAndroidTest --stacktrace
+          script: ./gradlew connectedCheck --stacktrace
 
       - name: Upload results
         if: ${{ always() }}
