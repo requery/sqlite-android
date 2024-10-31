@@ -168,6 +168,8 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
     private static native boolean nativeHasCodec();
     private static native void nativeLoadExtension(long connectionPtr, String file, String proc);
 
+    private static native void nativeRegisterUpdateHook(long connectionPtr, SQLiteUpdateHook updateCallback);
+
     public static boolean hasCodec(){ return nativeHasCodec(); }
 
     private SQLiteConnection(SQLiteConnectionPool pool,
@@ -252,6 +254,12 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
         // Register custom extensions
         for (SQLiteCustomExtension extension : mConfiguration.customExtensions) {
             nativeLoadExtension(mConnectionPtr, extension.path, extension.entryPoint);
+        }
+
+        final SQLiteUpdateHook sqliteUpdateHook = mConfiguration.sqliteUpdateHook;
+
+        if (sqliteUpdateHook != null) {
+            nativeRegisterUpdateHook(mConnectionPtr, sqliteUpdateHook);
         }
     }
 
@@ -452,6 +460,11 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
             if (!mConfiguration.functions.contains(function)) {
                 nativeRegisterFunction(mConnectionPtr, function);
             }
+        }
+
+        final SQLiteUpdateHook updateHook = configuration.sqliteUpdateHook;
+        if (updateHook != null) {
+            nativeRegisterUpdateHook(mConnectionPtr, updateHook);
         }
 
         // Remember what changed.

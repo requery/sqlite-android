@@ -939,6 +939,21 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         }
     }
 
+    public void setUpdateHook(SQLiteUpdateHook updateHook) {
+        synchronized (mLock) {
+            throwIfNotOpenLocked();
+
+            mConfigurationLocked.sqliteUpdateHook = updateHook;
+
+            try {
+                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+            } catch (RuntimeException ex) {
+                mConfigurationLocked.sqliteUpdateHook = null;
+                throw ex;
+            }
+        }
+    }
+
     /**
      * Gets the database version.
      *
