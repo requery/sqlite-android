@@ -7,11 +7,11 @@ on: [push, pull_request]
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        api-level: [35]
+        api-level: [29]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,13 +24,13 @@ jobs:
           distribution: "adopt"
 
       - name: Run Android tests
-        uses: reactivecircus/android-emulator-runner@v2.33.0
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           arch: x86
-          script: ./gradlew connectedCheck --stacktrace
+          script: ./gradlew connectedAndroidTest --stacktrace
 
       - name: Upload results
         if: ${{ always() }}
