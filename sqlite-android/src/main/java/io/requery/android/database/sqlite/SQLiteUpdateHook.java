@@ -8,5 +8,5 @@ public interface SQLiteUpdateHook {
     /**
      *
      */
-    void invoke(int operationType, String databaseName, String tableName, long rowId);
+    void onUpdateFromNative(int operationType, String databaseName, String tableName, long rowId);
 }
