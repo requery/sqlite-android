@@ -58,7 +58,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = "https://www.sqlite.org/2024/sqlite-amalgamation-3470000.zip"
+    sqliteDistributionUrl = "https://www.sqlite.org/2024/sqlite-amalgamation-3470200.zip"
 }
 
 tasks.register("downloadSqlite", Download) {
