@@ -21,11 +21,11 @@
 
 #include <inttypes.h>
 #include <jni.h>
-#include <JNIHelp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "JNIHelp.h"
 #include "CursorWindow.h"
 #include "android_database_SQLiteCommon.h"
 
