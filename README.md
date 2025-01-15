@@ -51,7 +51,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.47.2'
+    implementation 'com.github.requery:sqlite-android:3.48.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -153,7 +153,7 @@ Changes
 License
 -------
 
-    Copyright (C) 2017-2024 requery.io
+    Copyright (C) 2017-2025 requery.io
     Copyright (C) 2005-2012 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");

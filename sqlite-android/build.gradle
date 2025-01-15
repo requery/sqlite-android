@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    buildToolsVersion = "35.0.0"
+    buildToolsVersion = "35.0.1"
     ndkVersion "27.2.12479018"
 
     compileSdk 35
@@ -58,7 +58,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = "https://www.sqlite.org/2024/sqlite-amalgamation-3470200.zip"
+    sqliteDistributionUrl = "https://www.sqlite.org/2025/sqlite-amalgamation-3480000.zip"
 }
 
 tasks.register("downloadSqlite", Download) {
