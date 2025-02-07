@@ -26,7 +26,6 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -311,11 +310,7 @@ public abstract class AbstractCursor implements Cursor {
     @SuppressWarnings("deprecation")
     protected void onChange(boolean selfChange) {
         synchronized (mSelfObserverLock) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                mContentObservable.dispatchChange(selfChange, null);
-            } else {
-                mContentObservable.dispatchChange(selfChange);
-            }
+            mContentObservable.dispatchChange(selfChange, null);
             if (mNotifyUri != null && selfChange) {
                 mContentResolver.notifyChange(mNotifyUri, mSelfObserver);
             }
