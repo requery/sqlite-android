@@ -51,7 +51,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.45.0'
+    implementation 'com.github.requery:sqlite-android:3.49.0'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -109,13 +109,13 @@ Note that starting August 1, 2019, your apps published on Google Play will [need
 Requirements
 ------------
 
-The min SDK level is API level 19 (KitKat).
+The min SDK level is API level 21 (Lollipop).
 
 Versioning
 ----------
 
 The library is versioned after the version of SQLite it contains. For changes specific to just the
-wrapper API, a revision number is added e.g., 3.45.0-X, where X is the revision number.
+wrapper API, a revision number is added, e.g., 3.49.0-X, where X is the revision number.
 
 Acknowledgements
 ----------------
@@ -153,7 +153,7 @@ Changes
 License
 -------
 
-    Copyright (C) 2017-2024 requery.io
+    Copyright (C) 2017-2025 requery.io
     Copyright (C) 2005-2012 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");
