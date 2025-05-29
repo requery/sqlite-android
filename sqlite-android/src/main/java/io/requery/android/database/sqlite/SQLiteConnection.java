@@ -22,12 +22,10 @@
 package io.requery.android.database.sqlite;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteException;
-import android.os.Build;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -739,11 +737,7 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
                 try {
                     int fd = nativeExecuteForBlobFileDescriptor(
                             mConnectionPtr, statement.mStatementPtr);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                        return fd >= 0 ? ParcelFileDescriptor.adoptFd(fd) : null;
-                    } else {
-                        throw new UnsupportedOperationException();
-                    }
+                    return fd >= 0 ? ParcelFileDescriptor.adoptFd(fd) : null;
                 } finally {
                     detachCancellationSignal(cancellationSignal);
                 }
@@ -1043,11 +1037,7 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
         if (count != statement.mNumParameters) {
             String message = "Expected " + statement.mNumParameters + " bind arguments but "
                 + count + " were provided.";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                throw new SQLiteBindOrColumnIndexOutOfRangeException(message);
-            } else {
-                throw new SQLiteException(message);
-            }
+            throw new SQLiteBindOrColumnIndexOutOfRangeException(message);
         }
         if (count == 0) {
             return;
@@ -1101,7 +1091,6 @@ public final class SQLiteConnection implements CancellationSignal.OnCancelListen
      * @param obj the object whose value type is to be returned
      * @return object value type
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static int getTypeOfObject(Object obj) {
         if (obj == null) {
             return Cursor.FIELD_TYPE_NULL;
