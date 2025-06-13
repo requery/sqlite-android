@@ -17,7 +17,6 @@
 
 package io.requery.android.database;
 
-import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -93,7 +92,6 @@ public class DatabaseCursorTest {
         mDatabase.execSQL("INSERT INTO test (data) VALUES ('" + sString3 + "');");
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @MediumTest
     @Test
     public void testBlob() {
@@ -102,23 +100,23 @@ public class DatabaseCursorTest {
             "CREATE TABLE test (_id INTEGER PRIMARY KEY, s TEXT, d REAL, l INTEGER, b BLOB);");
         // insert blob
         Object[] args = new Object[4];
-        
+
         byte[] blob = new byte[1000];
         byte value = 99;
-        Arrays.fill(blob, value);        
+        Arrays.fill(blob, value);
         args[3] = blob;
-        
+
         String s = "text";
         args[0] = s;
         Double d = 99.9;
         args[1] = d;
         Long l = (long)1000;
         args[2] = l;
-        
+
         String sql = "INSERT INTO test (s, d, l, b) VALUES (?,?,?,?)";
         mDatabase.execSQL(sql, args);
         // use cursor to access blob
-        Cursor c = mDatabase.query("test", null, null, null, null, null, null);        
+        Cursor c = mDatabase.query("test", null, null, null, null, null, null);
         c.moveToNext();
         ContentValues cv = new ContentValues();
         //DatabaseUtils.cursorRowToContentValues(c, cv);
@@ -131,7 +129,7 @@ public class DatabaseCursorTest {
                 cv.put(columns[i], c.getString(i));
             }
         }
-        
+
         int bCol = c.getColumnIndexOrThrow("b");
         int sCol = c.getColumnIndexOrThrow("s");
         int dCol = c.getColumnIndexOrThrow("d");
@@ -143,7 +141,7 @@ public class DatabaseCursorTest {
         assertEquals((long)l, c.getLong(lCol));
         c.close();
     }
-    
+
     @MediumTest
     @Test
     public void testRealColumns() {
@@ -286,8 +284,8 @@ public class DatabaseCursorTest {
     @Test
     public void testManyRowsLong() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
-        
-        final int count = 36799; 
+
+        final int count = 36799;
         mDatabase.execSQL("BEGIN Transaction;");
         for (int i = 0; i < count; i++) {
             mDatabase.execSQL("INSERT INTO test (data) VALUES (" + i + ");");
@@ -343,12 +341,12 @@ public class DatabaseCursorTest {
         assertEquals(count, c.getCount());
         c.close();
     }
-    
+
     @LargeTest
     @Test
     public void testManyRowsTxtLong() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, txt TEXT, data INT);");
-        
+
         Random random = new Random(System.currentTimeMillis());
         StringBuilder randomString = new StringBuilder(1979);
         for (int i = 0; i < 1979; i++) {
@@ -382,7 +380,7 @@ public class DatabaseCursorTest {
         assertEquals(count, c.getCount());
         c.close();
     }
-   
+
     @MediumTest
     @Test
     public void testRequery() {
