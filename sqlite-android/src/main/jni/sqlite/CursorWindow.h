@@ -23,7 +23,6 @@
 #include <stdint.h>
 
 #include "Errors.h"
-#include <string>
 
 #if LOG_NDEBUG
 
@@ -50,7 +49,7 @@ namespace android {
  * Strings are stored in UTF-8.
  */
 class CursorWindow {
-    CursorWindow(const std::string& name, void* data, size_t size, bool readOnly);
+    CursorWindow(const char* name, void* data, size_t size, bool readOnly);
 
 public:
     /* Field types. */
@@ -80,9 +79,9 @@ public:
 
     ~CursorWindow();
 
-    static status_t create(const std::string& name, size_t size, CursorWindow** outCursorWindow);
+    static status_t create(const char* name, size_t size, CursorWindow** outCursorWindow);
 
-    inline std::string name() { return mName; }
+    inline const char* name() { return mName; }
     inline size_t size() { return mSize; }
     inline size_t freeSpace() { return mSize - mHeader->freeOffset; }
     inline uint32_t getNumRows() { return mHeader->numRows; }
@@ -156,7 +155,7 @@ private:
         uint32_t nextChunkOffset;
     };
 
-    std::string mName;
+    char* mName;
     void* mData;
     size_t mSize;
     bool mReadOnly;

@@ -27,16 +27,18 @@
 
 namespace android {
 
-CursorWindow::CursorWindow(const std::string& name, void* data, size_t size, bool readOnly) :
-        mName(name), mData(data), mSize(size), mReadOnly(readOnly) {
+CursorWindow::CursorWindow(const char* name, void* data, size_t size, bool readOnly) :
+        mData(data), mSize(size), mReadOnly(readOnly) {
+    mName = strdup(name);
     mHeader = static_cast<Header*>(mData);
 }
 
 CursorWindow::~CursorWindow() {
+    free(mName);
     free(mData);
 }
 
-status_t CursorWindow::create(const std::string& name, size_t size, CursorWindow** outWindow) {
+status_t CursorWindow::create(const char* name, size_t size, CursorWindow** outWindow) {
     status_t result;
     void* data = malloc(size);
     if (!data) {
@@ -54,6 +56,7 @@ status_t CursorWindow::create(const std::string& name, size_t size, CursorWindow
         *outWindow = window;
         return OK;
     }
+    delete window;
     return result;
 }
 

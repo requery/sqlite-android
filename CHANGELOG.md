@@ -1,6 +1,61 @@
 Change Log
 ==========
 
+## 3.50.4
+- [SQLite 3.50.4](https://www.sqlite.org/releaselog/3_50_4.html)
+- [SQLite 3.50.3](https://www.sqlite.org/releaselog/3_50_3.html)
+- [SQLite 3.50.2](https://www.sqlite.org/releaselog/3_50_2.html)
+- [SQLite 3.50.1](https://www.sqlite.org/releaselog/3_50_1.html)
+- [SQLite 3.50.0](https://www.sqlite.org/releaselog/3_50_0.html)
+- [SQLite 3.49.2](https://www.sqlite.org/releaselog/3_49_2.html)
+- [SQLite 3.49.1](https://www.sqlite.org/releaselog/3_49_1.html)
+
+## 3.49.0
+- [SQLite 3.49.0](https://www.sqlite.org/releaselog/3_49_0.html)
+- [SQLite 3.48.0](https://www.sqlite.org/releaselog/3_48_0.html)
+- [SQLite 3.47.2](https://www.sqlite.org/releaselog/3_47_2.html)
+- [SQLite 3.47.1](https://www.sqlite.org/releaselog/3_47_2.html)
+- [SQLite 3.47.0](https://www.sqlite.org/releaselog/3_47_0.html)
+- [SQLite 3.46.1](https://www.sqlite.org/releaselog/3_46_1.html)
+- [SQLite 3.46.0](https://www.sqlite.org/releaselog/3_46_0.html)
+- [SQLite 3.45.3](https://www.sqlite.org/releaselog/3_45_3.html)
+- [SQLite 3.45.2](https://www.sqlite.org/releaselog/3_45_2.html)
+- [SQLite 3.45.1](https://www.sqlite.org/releaselog/3_45_2.html)
+
+## 3.45.0
+- [SQLite 3.45.0](https://www.sqlite.org/releaselog/3_45_0.html)
+- [SQLite 3.44.2](https://www.sqlite.org/releaselog/3_44_2.html)
+- [SQLite 3.44.1](https://www.sqlite.org/releaselog/3_44_1.html)
+- [SQLite 3.44.0](https://www.sqlite.org/releaselog/3_44_0.html)
+- [SQLite 3.43.2](https://www.sqlite.org/releaselog/3_43_2.html)
+- [SQLite 3.43.1](https://www.sqlite.org/releaselog/3_43_1.html)
+
+## 3.43.0
+- [SQLite 3.43.0](https://www.sqlite.org/releaselog/3_43_0.html)
+
+## 3.42.0
+- [SQLite 3.42.0](https://www.sqlite.org/releaselog/3_42_0.html)
+- [SQLite 3.41.2](https://www.sqlite.org/releaselog/3_41_2.html)
+
+## 3.41.1
+- [SQLite 3.41.1](https://www.sqlite.org/releaselog/3_41_1.html)
+- [SQLite 3.41.0](https://www.sqlite.org/releaselog/3_41_0.html)
+- Fix getSqlStatementType statement type detection
+
+## 3.40.1
+- [SQLite 3.40.1](https://www.sqlite.org/releaselog/3_40_1.html)
+- [SQLite 3.40.0](https://www.sqlite.org/releaselog/3_40_0.html)
+- 
+## 3.39.2
+- [SQLite 3.39.2](https://www.sqlite.org/releaselog/3_39_2.html)
+- [SQLite 3.39.1](https://www.sqlite.org/releaselog/3_39_1.html)
+
+## 3.39.0
+- [SQLite 3.39.0](https://www.sqlite.org/releaselog/3_39_0.html)
+-
+## 3.38.5
+- [SQLite 3.38.5](https://www.sqlite.org/releaselog/3_38_5.html)
+
 ## 3.38.4
 - [SQLite 3.38.4](https://www.sqlite.org/releaselog/3_38_4.html)
 - [SQLite 3.38.3](https://www.sqlite.org/releaselog/3_38_3.html)

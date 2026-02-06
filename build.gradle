@@ -1,18 +1,4 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
-        classpath 'org.apache.httpcomponents:httpclient:4.5.13'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20"
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+plugins {
+    id "com.android.library" version "8.13.0" apply false
+    id "de.undercouch.download" version "5.6.0" apply false
 }

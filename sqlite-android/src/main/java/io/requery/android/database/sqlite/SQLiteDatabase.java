@@ -40,7 +40,6 @@ import android.util.Printer;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.os.CancellationSignal;
 import androidx.core.os.OperationCanceledException;
 import androidx.sqlite.db.SupportSQLiteDatabase;
@@ -968,6 +967,21 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
         }
     }
 
+    public void setUpdateHook(SQLiteUpdateHook updateHook) {
+        synchronized (mLock) {
+            throwIfNotOpenLocked();
+
+            mConfigurationLocked.sqliteUpdateHook = updateHook;
+
+            try {
+                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+            } catch (RuntimeException ex) {
+                mConfigurationLocked.sqliteUpdateHook = null;
+                throw ex;
+            }
+        }
+    }
+
     /**
      * Gets the database version.
      *
@@ -1380,7 +1394,6 @@ public final class SQLiteDatabase extends SQLiteClosable implements SupportSQLit
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     @Override
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public Cursor query(SupportSQLiteQuery supportQuery, android.os.CancellationSignal signal) {
         if (signal != null) {
             final CancellationSignal supportCancellationSignal = new CancellationSignal();

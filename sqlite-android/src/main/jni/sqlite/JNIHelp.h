@@ -102,12 +102,6 @@ void jniSetFileDescriptorOfFD(C_JNIEnv* env, jobject fileDescriptor, int value);
  */
 jobject jniGetReferent(C_JNIEnv* env, jobject ref);
 
-/*
- * Log a message and an exception.
- * If exception is NULL, logs the current exception in the JNI environment.
- */
-void jniLogException(C_JNIEnv* env, int priority, const char* tag, jthrowable exception);
-
 #ifdef __cplusplus
 }
 #endif
@@ -165,10 +159,6 @@ inline void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int va
 
 inline jobject jniGetReferent(JNIEnv* env, jobject ref) {
     return jniGetReferent(&env->functions, ref);
-}
-
-inline void jniLogException(JNIEnv* env, int priority, const char* tag, jthrowable exception = NULL) {
-    jniLogException(&env->functions, priority, tag, exception);
 }
 
 #endif

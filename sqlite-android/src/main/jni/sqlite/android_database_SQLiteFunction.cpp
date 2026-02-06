@@ -11,8 +11,6 @@
 #include "ALog-priv.h"
 #include "android_database_SQLiteCommon.h"
 
-#include <string>
-
 namespace android {
 
 /* Returns the sqlite3_value for the given arg of the given function.

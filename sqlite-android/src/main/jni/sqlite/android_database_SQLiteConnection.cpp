@@ -20,6 +20,7 @@
 #include <jni.h>
 #include <sys/mman.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
 
@@ -28,8 +29,6 @@
 #include "ALog-priv.h"
 #include "android_database_SQLiteCommon.h"
 #include "CursorWindow.h"
-
-#include <string>
 
 // Set to 1 to use UTF16 storage for localized indexes.
 #define UTF16_STORAGE 0
@@ -72,27 +71,35 @@ static struct {
 struct SQLiteConnection {
     sqlite3* const db;
     const int openFlags;
-    std::string path;
-    std::string label;
+    char* path;
+    char* label;
 
     volatile bool canceled;
 
-    SQLiteConnection(sqlite3* db, int openFlags, const std::string& path, const std::string& label) :
-        db(db), openFlags(openFlags), path(path), label(label), canceled(false) { }
+    SQLiteConnection(sqlite3* db, int openFlags, const char* path_, const char* label_) :
+        db(db), openFlags(openFlags), canceled(false) {
+        path = strdup(path_);
+        label = strdup(label_);
+    }
+
+    ~SQLiteConnection() {
+        free(path);
+        free(label);
+    }
 };
 
 // Called each time a statement begins execution, when tracing is enabled.
 static void sqliteTraceCallback(void *data, const char *sql) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
     ALOG(LOG_VERBOSE, SQLITE_TRACE_TAG, "%s: \"%s\"\n",
-            connection->label.c_str(), sql);
+            connection->label, sql);
 }
 
 // Called each time a statement finishes execution, when profiling is enabled.
 static void sqliteProfileCallback(void *data, const char *sql, sqlite3_uint64 tm) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
     ALOG(LOG_VERBOSE, SQLITE_PROFILE_TAG, "%s: \"%s\" took %0.3f ms\n",
-            connection->label.c_str(), sql, tm * 0.000001f);
+            connection->label, sql, tm * 0.000001f);
 }
 
 // Called after each SQLite VM instruction when cancelation is enabled.
@@ -130,21 +137,20 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
         jstring labelStr, jboolean enableTrace, jboolean enableProfile) {
 
     const char* pathChars = env->GetStringUTFChars(pathStr, NULL);
-    std::string path(pathChars);
-    env->ReleaseStringUTFChars(pathStr, pathChars);
-
     const char* labelChars = env->GetStringUTFChars(labelStr, NULL);
-    std::string label(labelChars);
-    env->ReleaseStringUTFChars(labelStr, labelChars);
 
     sqlite3* db;
-    int err = sqlite3_open_v2(path.c_str(), &db, openFlags, NULL);
+    int err = sqlite3_open_v2(pathChars, &db, openFlags, NULL);
     if (err != SQLITE_OK) {
+        env->ReleaseStringUTFChars(pathStr, pathChars);
+        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception_errcode(env, err, "Could not open database");
         return 0;
     }
     err = sqlite3_create_collation(db, "localized", SQLITE_UTF8, 0, coll_localized);
     if (err != SQLITE_OK) {
+        env->ReleaseStringUTFChars(pathStr, pathChars);
+        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception_errcode(env, err, "Could not register collation");
         sqlite3_close(db);
         return 0;
@@ -152,6 +158,8 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
 
     // Check that the database is really read/write when that is what we asked for.
     if ((openFlags & SQLITE_OPEN_READWRITE) && sqlite3_db_readonly(db, NULL)) {
+        env->ReleaseStringUTFChars(pathStr, pathChars);
+        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception(env, db, "Could not open the database in read/write mode.");
         sqlite3_close(db);
         return 0;
@@ -160,6 +168,8 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
     // Set the default busy handler to retry automatically before returning SQLITE_BUSY.
     err = sqlite3_busy_timeout(db, BUSY_TIMEOUT_MS);
     if (err != SQLITE_OK) {
+        env->ReleaseStringUTFChars(pathStr, pathChars);
+        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception(env, db, "Could not set busy timeout");
         sqlite3_close(db);
         return 0;
@@ -169,6 +179,8 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
 #if 0
     err = register_android_functions(db, UTF16_STORAGE);
     if (err) {
+        env->ReleaseStringUTFChars(pathStr, pathChars);
+        env->ReleaseStringUTFChars(labelStr, labelChars);
         throw_sqlite3_exception(env, db, "Could not register Android SQL functions.");
         sqlite3_close(db);
         return 0;
@@ -176,7 +188,10 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
 #endif
 
     // Create wrapper object.
-    SQLiteConnection* connection = new SQLiteConnection(db, openFlags, path, label);
+    SQLiteConnection* connection = new SQLiteConnection(db, openFlags, pathChars, labelChars);
+    ALOGV("Opened connection %p with label '%s'", db, labelChars);
+    env->ReleaseStringUTFChars(pathStr, pathChars);
+    env->ReleaseStringUTFChars(labelStr, labelChars);
 
     // Enable tracing and profiling if requested.
     if (enableTrace) {
@@ -186,7 +201,6 @@ static jlong nativeOpen(JNIEnv* env, jclass clazz, jstring pathStr, jint openFla
         sqlite3_profile(db, &sqliteProfileCallback, connection);
     }
 
-    ALOGV("Opened connection %p with label '%s'", db, label.c_str());
     return reinterpret_cast<jlong>(connection);
 }
 
@@ -204,6 +218,42 @@ static void nativeClose(JNIEnv* env, jclass clazz, jlong connectionPtr) {
         }
 
         delete connection;
+    }
+}
+
+static void sqliteUpdateHookCallback(void *pArg, int operationType, const char *databaseName, const char *tableName, sqlite3_int64 rowId) {
+    JNIEnv* env = 0;
+    gpJavaVM->GetEnv((void**)&env, JNI_VERSION_1_4);
+
+    jobject updateCallbackObjGlobal = reinterpret_cast<jobject>(pArg);
+    jobject updateCallbackObj = env->NewLocalRef(updateCallbackObjGlobal);
+
+    // TODO: Do something magical
+    // Get the Java class and method ID
+    jclass updateHookManagerClass = env->GetObjectClass(updateCallbackObj);
+    jmethodID onUpdateMethod = env->GetMethodID(updateHookManagerClass, "onUpdateFromNative", "(ILjava/lang/String;Ljava/lang/String;J)V");
+
+    if (onUpdateMethod != NULL) {
+        // Create Java strings from C strings
+        jstring dbName = env->NewStringUTF(databaseName);
+        jstring tblName = env->NewStringUTF(tableName);
+
+        // Call the Java method
+        env->CallVoidMethod(updateCallbackObj, onUpdateMethod, operationType, dbName, tblName, rowId);
+
+        // Clean up local references
+        env->DeleteLocalRef(dbName);
+        env->DeleteLocalRef(tblName);
+    } else {
+        ALOGE("Failed to find onUpdateFromNative method");
+    }
+
+    env->DeleteLocalRef(updateCallbackObj);
+
+    if (env->ExceptionCheck()) {
+        ALOGE("An exception was thrown by custom update callback.");
+        /* LOGE_EX(env); */
+        env->ExceptionClear();
     }
 }
 
@@ -357,6 +407,20 @@ static void nativeRegisterFunction(JNIEnv *env, jclass clazz, jlong connectionPt
         throw_sqlite3_exception(env, connection->db);
         return;
     }
+}
+
+static void nativeRegisterUpdateHook(JNIEnv* env, jclass clazz, jlong connectionPtr,
+                                         jobject updateCallbackObj) {
+    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+
+    jobject updateCallbackObjGlobal = env->NewGlobalRef(updateCallbackObj);
+
+    if (updateCallbackObjGlobal == NULL) {
+        ALOGE("Failed to create global reference for callback object");
+        return;
+    }
+
+    sqlite3_update_hook(connection->db, sqliteUpdateHookCallback, reinterpret_cast<void*>(updateCallbackObjGlobal));
 }
 
 static void nativeRegisterLocalizedCollators(JNIEnv* env, jclass clazz, jlong connectionPtr,
@@ -993,7 +1057,8 @@ static JNINativeMethod sMethods[] =
             (void*)nativeHasCodec },
     { "nativeLoadExtension", "(JLjava/lang/String;Ljava/lang/String;)V",
             (void*)nativeLoadExtension },
-    {"nativeResetStatement", "(JJZ)V", (void *) nativeResetStatement},
+    { "nativeRegisterUpdateHook", "(JLio/requery/android/database/sqlite/SQLiteUpdateHook;)V",
+            (void*)nativeRegisterUpdateHook },
 };
 
 int register_android_database_SQLiteConnection(JNIEnv *env)
