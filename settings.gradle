@@ -10,9 +10,19 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        def props = new Properties()
+        file("${rootDir}/gradle.properties").withInputStream { props.load(it) }
+        def buildId = props.getProperty("androidx.inspection.snapshot.buildId", "15127136")
+        maven {
+            url = uri("https://androidx.dev/snapshots/builds/${buildId}/artifacts/repository")
+            content {
+                includeGroup("androidx.inspection")
+            }
+        }
     }
 }
 
 rootProject.name = 'requery-sqlite'
 
 include ':sqlite-android'
+include ':sqlite-android-inspection'

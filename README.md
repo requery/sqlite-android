@@ -74,6 +74,34 @@ on a `SupportSQLiteOpenHelper.Configuration` and `SupportSQLiteOpenHelper.Callba
 This also allows you to use sqlite-android with libraries like Room by passing an instance
 of `RequerySQLiteOpenHelperFactory` to them.
 
+### Android Studio Database Inspector (API 26+)
+
+App Inspection’s Database Inspector expects AndroidX’s sqlite inspector and the official
+`androidx.inspection` runtime (including `libart_tooling.so`). Add the optional
+**`sqlite-android-inspection`** artifact **for debug builds only**:
+
+```gradle
+// Root settings.gradle: androidx.dev snapshot (see gradle.properties in this repo for build id).
+dependencyResolutionManagement {
+    repositories {
+        // ... google(), mavenCentral(), etc.
+        maven {
+            url "https://androidx.dev/snapshots/builds/<BUILD_ID>/artifacts/repository"
+            content { includeGroup("androidx.inspection") }
+        }
+    }
+}
+
+dependencies {
+    implementation "com.github.requery:sqlite-android:<version>"
+    // JitPack multi-module artifact (see https://docs.jitpack.io/#building-a-multi-module-project)
+    debugImplementation "com.github.requery.sqlite-android:sqlite-android-inspection:<version>"
+}
+```
+
+When consuming the library from Maven, use the same snapshot repository so the transitive
+`androidx.inspection:inspection` dependency resolves. See `sqlite-android-inspection/VENDOR.txt`.
+
 
 CPU Architectures
 -----------------

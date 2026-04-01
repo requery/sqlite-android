@@ -23,6 +23,9 @@ jobs:
           java-version: "17"
           distribution: "adopt"
 
+      - name: Verify sqlite-android-inspection
+        run: ./scripts/verify-sqlite-android-inspection.sh
+
       - name: Run Android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:

@@ -6,4 +6,5 @@
 /.idea/libraries
 .DS_Store
 /build
+sqlite-android-inspection/build/
 /captures

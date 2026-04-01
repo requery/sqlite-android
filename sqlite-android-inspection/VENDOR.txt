@@ -1,0 +1,16 @@
+androidx.sqlite.inspection fork for io.requery (OpenParams-free), plus proto and SPI
+(META-INF/services/androidx.inspection.InspectorFactory → SqliteInspectorFactory).
+
+Runtime androidx.inspection.* and libart_tooling.so come from Maven artifact
+androidx.inspection:inspection (not vendored here). Snapshot repo and build id:
+gradle.properties (androidx.inspection.version, androidx.inspection.snapshot.buildId);
+settings.gradle adds https://androidx.dev/snapshots/builds/<BUILD_ID>/artifacts/repository
+
+debugApi(inspection): transitive for debug consumers. releaseCompileOnly: release AAR does not bundle JVMTI.
+
+App: debugImplementation(project(":sqlite-android-inspection")) or published coordinates.
+If the app resolves this module from Maven (not project()), add the same androidx.dev snapshot repo
+(or a mirror) so transitive androidx.inspection:inspection resolves.
+
+Checks: ./scripts/verify-sqlite-android-inspection.sh
+E2E (device): ./gradlew :sqlite-android-inspection:connectedDebugAndroidTest (InspectionJvmtiRuntimeTest)
