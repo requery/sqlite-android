@@ -1,11 +1,11 @@
 plugins {
     id "de.undercouch.download"
     id "com.android.library"
-    id "com.vanniktech.maven.publish" version "0.34.0"
+    id "com.vanniktech.maven.publish" version "0.36.0"
 }
 
 android {
-    buildToolsVersion = "36.1.0"
+    buildToolsVersion = "37.0.0"
     ndkVersion "28.2.13676358"
 
     compileSdk {
@@ -58,7 +58,7 @@ dependencies {
 }
 
 ext {
-    sqliteDistributionUrl = "https://www.sqlite.org/2025/sqlite-amalgamation-3500400.zip"
+    sqliteDistributionUrl = "https://www.sqlite.org/2026/sqlite-amalgamation-3530100.zip"
 }
 
 tasks.register("downloadSqlite", Download) {

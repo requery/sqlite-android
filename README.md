@@ -3,8 +3,8 @@
 ![Build Status](https://github.com/requery/sqlite-android/actions/workflows/ci.yml/badge.svg)
 [![Download](https://jitpack.io/v/requery/sqlite-android.svg)](https://jitpack.io/#requery/sqlite-android)
 
-This is an Android specific distribution of the latest versions of SQLite.
-It contains the latest SQLite version and the Android specific database APIs
+This is an Android-specific distribution of the latest versions of SQLite.
+It contains the latest SQLite version and the Android-specific database APIs
 derived from AOSP packaged as an AAR library distributed on jitpack.
 
 Why?
@@ -51,7 +51,7 @@ Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.requery:sqlite-android:3.50.4'
+    implementation 'com.github.requery:sqlite-android:3.53.1'
 }
 ```
 Then change usages of `android.database.sqlite.SQLiteDatabase` to
@@ -115,7 +115,7 @@ Versioning
 ----------
 
 The library is versioned after the version of SQLite it contains. For changes specific to just the
-wrapper API, a revision number is added, e.g., 3.50.4-X, where X is the revision number.
+wrapper API, a revision number is added, e.g., 3.53.1-X, where X is the revision number.
 
 Acknowledgements
 ----------------
@@ -153,7 +153,7 @@ Changes
 License
 -------
 
-    Copyright (C) 2017-2025 requery.io
+    Copyright (C) 2017-2026 requery.io
     Copyright (C) 2005-2012 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");
